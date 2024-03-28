@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Link2Feed Improver",
+    "name": "Croton Link2Feed Improver",
     "description": "Improve some elements of the Link2Feed UI.",
     "version": "1.0",
     "icons": {
@@ -11,10 +11,15 @@
     },
     "content_scripts": [
       {
-        "js": ["scripts/content.js"],
+        "js": ["scripts/create.js"],
         "matches": [
-          "https://developer.chrome.com/docs/extensions/*",
-          "https://developer.chrome.com/docs/webstore/*"
+          "https://portal.link2feed.com/org/27075/intake/*"
+        ]
+      },
+      {
+        "js": [ "scripts/checkin.js"],
+        "matches": [
+            "https://portal.link2feed.com/org/27075/dashboard"
         ]
       }
     ]

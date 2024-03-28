@@ -1,8 +1,4 @@
 
-const checkInPage = 'https://portal.link2feed.com/org/27075/'
-
-if (tab.url === checkInPage) {
-
     /*
      *  Move Searchbox up
      */
@@ -38,24 +34,3 @@ if (tab.url === checkInPage) {
     const observer = new MutationObserver(callback);
     // Start observing the target node for configured mutations
     observer.observe(targetNode, config);
-} else if (tab.url.startsWith('https://portal.link2feed.com/org/27075/intake')) {
-
-
-    // Precheck all the fields!
-
-    // Verbal consent
-    if (document.forms['intake_personal_type']['intake_personal_type[consentVerbal]'].value == '') {
-        document.forms['intake_personal_type']['intake_personal_type[consentVerbal]'].value = 1;
-    }
-    if (document.forms['intake_personal_type']['intake_personal_type[consentWritten]'].value == '') {
-        document.forms['intake_personal_type']['intake_personal_type[consentWritten]'].value = 1;
-    }
-    // Default phone to mobile
-    document.getElementById('client-contact-phone-new').click();
-    // Defauly id to barcode
-    if (document.getElementById('s2id_client_identity_identity_type_new0') == null) {
-        document.getElementById('intake_personal_type-identity-document-new').click();
-    }
-
-}
-
