@@ -19,7 +19,8 @@
       {
         "js": [ "scripts/checkin.js"],
         "matches": [
-            "https://portal.link2feed.com/org/27075/dashboard"
+            "https://portal.link2feed.com/org/27075/dashboard",
+            "https://portal.link2feed.com/org/27075/"
         ]
       }
     ]
