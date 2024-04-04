@@ -85,18 +85,48 @@
                 window.scrollTo(0,0);
                 document.getElementById('intake_personal_type_lastName').focus();
             }
+            window.setTimeout(afterSecondDelay, 1000);
         }
-        window.setTimeout(afterDelay, 1000);    
+        window.setTimeout(afterDelay, 1000);  
+        
+        function afterSecondDelay() {
+            if (document.getElementById('client_phone_is_primary_new0') != null) {
+                document.getElementById('client_phone_is_primary_new0').checked= true;
+            }
+            const idField = document.getElementById('client_identity_document_identifier_new1');
+            if (idField != null) {
+                idField.addEventListener('keyup', function() {
+                    const valSoFar = idField.value.substring(0,7);
+                    if ('9918222'.indexOf(valSoFar) !== 0) {
+                        idField.style.color = '#ff0000';
+                    } else {
+                        idField.style.color = '#000000';
+                    }
+                });
+                idField.addEventListener('blur', function() {
+                    if (idField.value.length != 10 || idField.value.indexOf('9918222') != 0 ) {
+                        idField.style.color = '#ff0000';
+                    }
+                });
+                idField.addEventListener('focus', function() {
+                    idField.style.color = '#000000';
+                });
+            }
+        }
+        // Make an age box, and set date and check approximate box  
     } else if (document.location.href.indexOf("/page/monthly-income") > -1) {
+        const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
+        const clientIdEndSpot = document.location.href.indexOf('/page/monthly-income');
+        const clientId = document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
 
         // Autocomplete income portion
         // https://portal.link2feed.com/org/27075/intake/14852239/page/monthly-income
         // Click Add, select Undisclosed
-
-        if (document.getElementById('client-income-14880306-template')) {
-        let incomeTemplate =  document.getElementById('client-income-14880306-template').innerHTML;
-        incomeTemplate = incomeTemplate.replace('<option value="10405">Undisclosed</option>', '<option value="10405" selected="selected">Undisclosed</option>')
-        document.getElementById('client-income-14880306-template').innerHTML = incomeTemplate;
+        const incomeDiv = document.getElementById('client-income-' + clientId + '-template');
+        if (incomeDiv) {
+            let incomeTemplate =  incomeDiv.innerHTML;
+            incomeTemplate = incomeTemplate.replace('<option value="10405">Undisclosed</option>', '<option value="10405" selected="selected">Undisclosed</option>')
+            incomeDiv.innerHTML = incomeTemplate;
         }
         
         // Some changes can only happen after page loads.
@@ -114,8 +144,25 @@
             if (stoleFocus) {
                 window.scrollTo(0,0);
             }
+            window.setTimeout(afterSecondDelay, 1000);
         }
         window.setTimeout(afterDelay, 1000);
+
+
+        function afterSecondDelay() {
+            if (document.getElementById('client_income_is_primary_new0') != null) {
+                document.getElementById('client_income_is_primary_new0').checked= true;
+            }
+        }
+    } else if (document.location.href.indexOf("/page/dietary-considerations") > -1) {
+        function afterDelay() {
+
+           
+            // Ethnicity
+            document.getElementById('intake_dietary_considerations_type_dietaryConsiderations_18531').checked = true;
+
+        }
+        window.setTimeout(afterDelay, 500);
     }
     //
 
