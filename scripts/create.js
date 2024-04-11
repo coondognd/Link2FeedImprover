@@ -11,7 +11,7 @@
         }
         if (document.forms['intake_personal_type'] && document.forms['intake_personal_type']['intake_personal_type[consentWritten]'].value == '') {
             document.forms['intake_personal_type']['intake_personal_type[consentWritten]'].value = 1;
-        }
+        } 
 
         // First visit
         if (document.getElementById('intake_personal_type_firstFoodBankVisit_selector').selectedIndex == 0) {
@@ -37,7 +37,7 @@
             document.getElementById('intake_personal_type-identity-document-template').innerHTML = barcodeTemplate;
         }
 
-        const targetNode = document.getElementById("hh-member-modal-container");
+        const targetNode = document.getElementById("hh-member-modal-container" );
         // Options for the observer (which mutations to observe)
         const config = { attributes: true, childList: false, subtree: false };
         
