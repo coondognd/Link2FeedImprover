@@ -4,6 +4,7 @@ function checkSearch() {
     const INTENT_NAME = 0;
     const INTENT_BARCODE = 1;
     //const INTENT_PHONE = 2;
+    const barCodeStart = '9918222';
 
     searchParent = document.getElementById('search-forms');
     if (!searchParent) {
@@ -27,9 +28,6 @@ function checkSearch() {
     const nameRegex = new RegExp('^[a-zA-Z\., ]+$');
     const numericRegex = new RegExp('^[0-9]+$');
 
-    const valSoFar = document.getElementById('intake_search_' + activeSearch.id).value;
-
-    let intent = null;
     let correctElementNames = [
         { 
             tab : '#client_search_handler',
@@ -44,15 +42,7 @@ function checkSearch() {
             search : 'intake_search_phone_search_handler'
         },*/
     ]
-    if (nameRegex.test(valSoFar)) {
-        intent = INTENT_NAME;
-    } else if (valSoFar.length > 1 && '991222'.indexOf(valSoFar.substring(0, 7)) == 0) {
-        intent = INTENT_BARCODE;
-    //} else if (valSoFar.length > 2 && ['914', '845'].includes(valSoFar.substring(0,3))) {
-    //    intent = INTENT_PHONE;
-    }
-    //console.log("Intent is " + intent);
-
+    
     let actual = null;
     if (activeSearch.id == 'client_search_handler') {
         actual = INTENT_NAME;
@@ -62,6 +52,24 @@ function checkSearch() {
     //   actual = INTENT_PHONE
     }
     //console.log("Actual is " + actual)
+
+    // Allow "." as a shortcut for 9918222
+    if (actual == INTENT_BARCODE && document.getElementById(correctElementNames[actual].search).value == ".") {
+        document.getElementById(correctElementNames[actual].search).value = barCodeStart;
+    }
+
+    const valSoFar = document.getElementById('intake_search_' + activeSearch.id).value;
+
+    let intent = null;
+    if (nameRegex.test(valSoFar)) {
+        intent = INTENT_NAME;
+    } else if (valSoFar.length > 1 && barCodeStart.indexOf(valSoFar.substring(0, 7)) == 0) {
+        intent = INTENT_BARCODE;
+    //} else if (valSoFar.length > 2 && ['914', '845'].includes(valSoFar.substring(0,3))) {
+    //    intent = INTENT_PHONE;
+    }
+    //console.log("Intent is " + intent);
+
 
     if (intent !== actual && intent != null) {
         /*
@@ -80,6 +88,7 @@ function checkSearch() {
             }
         }
         document.getElementById(correctElementNames[intent].search).value = valSoFar;
+        document.getElementById(correctElementNames[actual].search).value = "";
         //var evt = document.createEvent("HTMLEvents");
         //evt.initEvent('keyup', true, true);
         //document.getElementById(correctElementNames[intent].search).dispatchEvent(evt);
@@ -96,7 +105,7 @@ function checkSearch() {
                 }
                 break;
             case 'client_barcode_search_handler':
-                if (valSoFar.length > 10 || (valSoFar.length <= 7 && '9918222'.indexOf(valSoFar) !== 0)) {
+                if (valSoFar.length > 10 || (valSoFar.length <= 7 && barCodeStart.indexOf(valSoFar) !== 0)) {
                     backgroundColor = '#ffdddd';
                 }
                 break;

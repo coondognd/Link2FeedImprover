@@ -26,6 +26,17 @@ const callback = (mutationList, observer) => {
                 var evt = document.createEvent("HTMLEvents");
                 evt.initEvent('change', true, true);
                 document.getElementById('quick_click-form-esig-signature-type').dispatchEvent(evt);
+
+                // Add Edit link next to client name
+                /*
+                const nameElements = document.querySelectorAll("#esignature-modal .client-name")
+                if (nameElements && nameElements.length) {
+                    nameElement = nameElements[0];
+                    nameElement.innerHTML += "&nbsp;<a href='/org/27075/intake/" + qcvisit.clientId + "/page/personal?search=true'>Edit in new Tab</a>";
+                }
+                */
+
+                // #esignature-modal <somestuff> .clint-name 
             }
         }
     }

@@ -2,7 +2,6 @@
 
     // Precheck all the fields!
 
-    console.log(document.location.href);
 
     if (document.location.href.indexOf('/page/personal') > -1) {
         //  Consents
@@ -51,6 +50,7 @@
                         //console.log(document.getElementById("intake_household_member_type_ethnicities_18513"));
                         //console.log(document.getElementById("intake_household_member_type_ethnicities_18513").selected)
                         document.getElementById("intake_household_member_type_ethnicities_18513").checked = true;
+                       
                     }, 1000);
                 }
             }
@@ -78,7 +78,10 @@
                 stoleFocus = true;
             }
             // Ethnicity
-            document.getElementById('intake_personal_type_ethnicities_18513').checked = true;
+            document.getElementById('intake_personal_type_ethnicities_18513').checked = true; 
+            // Correct "Croton-on Hudson"
+            document.getElementById('intake_personal_type_household_address_city').value = document.getElementById('intake_personal_type_household_address_city').value.replace("Croton-on Hudson", "Croton-on-Hudson");
+    
 
             // Put focus back at top
             if (stoleFocus) {
@@ -120,7 +123,6 @@
         const clientId = document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
 
         // Autocomplete income portion
-        // https://portal.link2feed.com/org/27075/intake/14852239/page/monthly-income
         // Click Add, select Undisclosed
         const incomeDiv = document.getElementById('client-income-' + clientId + '-template');
         if (incomeDiv) {
@@ -164,11 +166,3 @@
         }
         window.setTimeout(afterDelay, 500);
     }
-    //
-
-    // Verify barcode on submit
-    // Ethnicity for Household members
-
-    //https://portal.link2feed.com/org/27075/intake/14881254/page/dietary-considerations
-    // Check "Didn't Ask"
-    // intake_dietary_considerations_type_dietaryConsiderations_18531 .checked = true
