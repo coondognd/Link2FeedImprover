@@ -4,7 +4,7 @@ function checkSearch() {
     const INTENT_NAME = 0;
     const INTENT_BARCODE = 1;
     //const INTENT_PHONE = 2;
-    const barCodeStart = '9918222';
+    const barCodeStart = '99182';
 
     searchParent = document.getElementById('search-forms');
     if (!searchParent) {
@@ -25,7 +25,7 @@ function checkSearch() {
     //if (!activeTabs || activeTabs.length == 0) { console.log('No active Tabs'); return; }
 
 
-    const nameRegex = new RegExp('^[a-zA-Z\., ]+$');
+    const nameRegex = new RegExp('^[a-zA-Z\.\-, ]+$');
     const numericRegex = new RegExp('^[0-9]+$');
 
     let correctElementNames = [
@@ -53,7 +53,7 @@ function checkSearch() {
     }
     //console.log("Actual is " + actual)
 
-    // Allow "." as a shortcut for 9918222
+    // Allow "." as a shortcut for 99182
     if (actual == INTENT_BARCODE && document.getElementById(correctElementNames[actual].search).value == ".") {
         document.getElementById(correctElementNames[actual].search).value = barCodeStart;
     }

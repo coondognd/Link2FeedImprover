@@ -49,6 +49,8 @@
                     window.setTimeout(function() {
                         //console.log(document.getElementById("intake_household_member_type_ethnicities_18513"));
                         //console.log(document.getElementById("intake_household_member_type_ethnicities_18513").selected)
+                        
+                        // TODO:  Only do this if nothing is set
                         document.getElementById("intake_household_member_type_ethnicities_18513").checked = true;
                        
                     }, 1000);
@@ -78,8 +80,11 @@
                 stoleFocus = true;
             }
             // Ethnicity
-            document.getElementById('intake_personal_type_ethnicities_18513').checked = true; 
+            // Commenting out, as no longer needed
+            //document.getElementById('intake_personal_type_ethnicities_18513').checked = true; 
+
             // Correct "Croton-on Hudson"
+            // Only a problem for some users early on in L2F
             document.getElementById('intake_personal_type_household_address_city').value = document.getElementById('intake_personal_type_household_address_city').value.replace("Croton-on Hudson", "Croton-on-Hudson");
     
 
@@ -100,14 +105,14 @@
             if (idField != null) {
                 idField.addEventListener('keyup', function() {
                     const valSoFar = idField.value.substring(0,7);
-                    if ('9918222'.indexOf(valSoFar) !== 0) {
+                    if ('99182'.indexOf(valSoFar) !== 0 || idField.value.length > 10) {
                         idField.style.color = '#ff0000';
                     } else {
                         idField.style.color = '#000000';
                     }
                 });
                 idField.addEventListener('blur', function() {
-                    if (idField.value.length != 10 || idField.value.indexOf('9918222') != 0 ) {
+                    if (idField.value.length != 10 || idField.value.indexOf('99182') != 0 ) {
                         idField.style.color = '#ff0000';
                     }
                 });
@@ -116,7 +121,7 @@
                 });
             }
         }
-        // Make an age box, and set date and check approximate box  
+        // TODO: Make an age box, and set date and check approximate box  
     } else if (document.location.href.indexOf("/page/monthly-income") > -1) {
         const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
         const clientIdEndSpot = document.location.href.indexOf('/page/monthly-income');
@@ -160,7 +165,7 @@
         function afterDelay() {
 
            
-            // Ethnicity
+            // TODO:  Only do this if nothing is set
             document.getElementById('intake_dietary_considerations_type_dietaryConsiderations_18531').checked = true;
 
         }
