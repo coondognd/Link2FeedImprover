@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Croton Link2Feed Improver",
     "description": "Improve some elements of the Link2Feed UI.",
-    "version": "1.0",
+    "version": "1.1",
     "icons": {
         "16": "images/ccfp_16.png",
         "32": "images/ccfp_32.png",

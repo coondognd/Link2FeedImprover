@@ -1,5 +1,6 @@
     //https://portal.link2feed.com/org/27075/intake/14852358/page/personal
 
+    const barCodeStart = '9918';
     // Precheck all the fields!
 
 
@@ -101,21 +102,27 @@
             if (document.getElementById('client_phone_is_primary_new0') != null) {
                 document.getElementById('client_phone_is_primary_new0').checked= true;
             }
+            // Warn on bad barcode
             const idField = document.getElementById('client_identity_document_identifier_new1');
             if (idField != null) {
                 idField.addEventListener('keyup', function() {
-                    const valSoFar = idField.value.substring(0,7);
-                    if ('99182'.indexOf(valSoFar) !== 0 || idField.value.length > 10) {
+                    const valSoFar = idField.value.substring(0,barCodeStart.length);
+                    if (idField.value.length > 10) {
                         idField.style.color = '#ff0000';
+                    } else if (barCodeStart.indexOf(valSoFar) !== 0) {
+                        idField.style.color = '#ff9900';
                     } else {
                         idField.style.color = '#000000';
                     }
                 });
                 idField.addEventListener('blur', function() {
-                    if (idField.value.length != 10 || idField.value.indexOf('99182') != 0 ) {
+                    if (idField.value.length != 10) {
                         idField.style.color = '#ff0000';
+                    } else if (idField.value.indexOf(barCodeStart) != 0 ) {
+                        idField.style.color = '#ff9900';
                     }
                 });
+                // Remove error highlight when editing the field
                 idField.addEventListener('focus', function() {
                     idField.style.color = '#000000';
                 });
