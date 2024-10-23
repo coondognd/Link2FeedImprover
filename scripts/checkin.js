@@ -8,6 +8,10 @@ if (referenceElement && elementToMove) {
     referenceElement.parentNode.insertBefore(elementToMove, referenceElement.nextSibling);
 }
 
+/*
+ * Hide Quick Click, to prevent accidental change
+ */
+document.getElementById("quick-click-panel").style.display = 'none';
 
 /*
  *  Change default attestation type
@@ -22,11 +26,12 @@ const callback = (mutationList, observer) => {
         if (mutation.type === "attributes") {
             console.log(mutation);
             if (targetNode.style.display !== "none") {
+                /*
                 document.getElementById('quick_click-form-esig-signature-type').options[2].selected = true;
                 var evt = document.createEvent("HTMLEvents");
                 evt.initEvent('change', true, true);
                 document.getElementById('quick_click-form-esig-signature-type').dispatchEvent(evt);
-
+                */
                 // Add Edit link next to client name
                 /*
                 const nameElements = document.querySelectorAll("#esignature-modal .client-name")
