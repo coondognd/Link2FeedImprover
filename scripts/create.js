@@ -52,7 +52,7 @@
                         //console.log(document.getElementById("intake_household_member_type_ethnicities_18513").selected)
                         
                         // TODO:  Only do this if nothing is set
-                        document.getElementById("intake_household_member_type_ethnicities_18513").checked = true;
+                        //document.getElementById("intake_household_member_type_ethnicities_18513").checked = true;
                        
                     }, 1000);
                 }

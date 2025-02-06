@@ -25,7 +25,7 @@ function checkSearch() {
     //if (!activeTabs || activeTabs.length == 0) { console.log('No active Tabs'); return; }
 
 
-    const nameRegex = new RegExp('^[a-zA-Z\\.\\-,\\s]+$');
+    const nameRegex = new RegExp('^[a-zA-Z\\.\\-\',\\s]+$');
     const numericRegex = new RegExp('^[0-9]+$');
 
     let correctElementNames = [
