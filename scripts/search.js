@@ -151,3 +151,69 @@ setTimeout(function () {
 }, 1000)
 
 */
+
+/*
+ *  Let the user know if the search is still going or not
+ */
+const STANDBY = 0;
+const SEARCHING = 1;
+const searchFormElement = document.getElementById('search-forms');
+const newDiv = document.createElement("div");
+newDiv.id = 'searchResultsDisplay'
+searchFormElement.appendChild(newDiv);
+const errorDisplayElement = document.getElementById('searchResultsDisplay');
+const searchResultDropdownElements = document.getElementsByClassName('ui-autocomplete');
+var state = STANDBY
+
+
+var observer = new MutationObserver(function (event) {
+    console.log(event)
+    const e = event[0].target;
+    console.log(e.classList)
+    if (state == STANDBY && e.classList.contains('ui-autocomplete-loading')) {
+        state = SEARCHING;
+        errorDisplayElement.innerText = 'Searching...';
+    }
+    if (state == SEARCHING && e.classList.contains('ui-autocomplete-loading')) {
+        //console.log("Still searching");
+    }
+    if (state == SEARCHING && !e.classList.contains('ui-autocomplete-loading')) {
+        var found = false;
+        for (searchResultDropdownElement of searchResultDropdownElements) {
+            if (searchResultDropdownElement.style.display !== 'none') {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            errorDisplayElement.innerText = '';
+        } else {
+            errorDisplayElement.innerText = 'No results';
+        }
+    }
+})
+
+
+const clientSearchElements = [
+    'intake_search_client_id_search_handler',
+    'intake_search_client_dob_search_handler',
+    'intake_search_address_search_handler',
+    'intake_search_client_search_handler',
+    'intake_search_phone_search_handler',
+    'intake_search_client_barcode_search_handler'
+]
+
+for (clientSearchElement of clientSearchElements) {
+    var e = document.getElementById(clientSearchElement)
+    observer.observe(e, {
+        attributes: true,
+        attributeFilter: ['class'],
+        childList: false,
+        characterData: false
+    })
+
+}
+
+/*
+ *   End Search-still-going logic
+ */ 
