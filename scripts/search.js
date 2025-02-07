@@ -1,4 +1,11 @@
 
+
+const searchFormElement = document.getElementById('search-forms');
+const newDiv = document.createElement("div");
+newDiv.id = 'searchResultsDisplay'
+searchFormElement.appendChild(newDiv);
+const errorDisplayElement = document.getElementById('searchResultsDisplay');
+
 // Warn if wrong search tab is selected
 function checkSearch() {
     const INTENT_NAME = 0;
@@ -59,6 +66,9 @@ function checkSearch() {
     }
 
     const valSoFar = document.getElementById('intake_search_' + activeSearch.id).value;
+    if (valSoFar == '') {
+        errorDisplayElement.innerText = '';
+    }
 
     let intent = null;
     if (nameRegex.test(valSoFar)) {
@@ -157,19 +167,12 @@ setTimeout(function () {
  */
 const STANDBY = 0;
 const SEARCHING = 1;
-const searchFormElement = document.getElementById('search-forms');
-const newDiv = document.createElement("div");
-newDiv.id = 'searchResultsDisplay'
-searchFormElement.appendChild(newDiv);
-const errorDisplayElement = document.getElementById('searchResultsDisplay');
 const searchResultDropdownElements = document.getElementsByClassName('ui-autocomplete');
 var state = STANDBY
 
 
 var observer = new MutationObserver(function (event) {
-    console.log(event)
     const e = event[0].target;
-    console.log(e.classList)
     if (state == STANDBY && e.classList.contains('ui-autocomplete-loading')) {
         state = SEARCHING;
         errorDisplayElement.innerText = 'Searching...';
