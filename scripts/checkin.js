@@ -50,10 +50,10 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
                 if (houseHoldSize >= 5) {
                     largeFamilyDiv.style.fontWeight = 'bold';
                     largeFamilyDiv.style.fontSize = '2em'
-                    largeFamilyDiv.innerText = 'Large Family!'
-                } else {
+//                    largeFamilyDiv.innerText = 'Large Family!'
+                } //else {
                     largeFamilyDiv.innerText = 'Household size: ' + houseHoldSize
-                }
+                //}
             }
         }
     } else {
@@ -70,6 +70,7 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
 /*
  * Esignature modal
  */
+/*
 const targetNode = document.getElementById("esignature-modal");
 // Options for the observer (which mutations to observe)
 const config = { attributes: true, childList: false, subtree: false };
@@ -82,22 +83,19 @@ const callback = (mutationList, observer) => {
             if (targetNode.style.display !== "none") {
                 //console.log("Open eSig modal")
 
-                /*
-                document.getElementById('quick_click-form-esig-signature-type').options[2].selected = true;
-                var evt = document.createEvent("HTMLEvents");
-                evt.initEvent('change', true, true);
-                document.getElementById('quick_click-form-esig-signature-type').dispatchEvent(evt);
-                */
+                
+                //document.getElementById('quick_click-form-esig-signature-type').options[2].selected = true;
+                //var evt = document.createEvent("HTMLEvents");
+                //evt.initEvent('change', true, true);
+                //document.getElementById('quick_click-form-esig-signature-type').dispatchEvent(evt);
+                
                 // Add Edit link next to client name
-                /*
-                const nameElements = document.querySelectorAll("#esignature-modal .client-name")
-                if (nameElements && nameElements.length) {
-                    nameElement = nameElements[0];
-                    nameElement.innerHTML += "&nbsp;<a href='/org/27075/intake/" + qcvisit.clientId + "/page/personal?search=true'>Edit in new Tab</a>";
-                }
-                */
+                //const nameElements = document.querySelectorAll("#esignature-modal .client-name")
+                //if (nameElements && nameElements.length) {
+                //    nameElement = nameElements[0];
+                //    nameElement.innerHTML += "&nbsp;<a href='/org/27075/intake/" + qcVisit.clientId + "/page/personal?search=true'>Edit in new Tab</a>";
+                //}
 
-                // #esignature-modal <somestuff> .clint-name 
             }
         }
     }
@@ -107,6 +105,7 @@ const callback = (mutationList, observer) => {
 const esigObserver = new MutationObserver(callback);
 // Start observing the target node for configured mutations
 esigObserver.observe(targetNode, config);
+*/
 
 /*
  * VisitRecording modal
