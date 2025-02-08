@@ -15,17 +15,20 @@ function checkSearch() {
 
     searchParent = document.getElementById('search-forms');
     if (!searchParent) {
-        console.log("No parent element")
+        //console.log("No parent element")
         return;
     }
     activeSearches = searchParent.getElementsByClassName('active');
-    if (!activeSearches || activeSearches.length == 0) { console.log('No active searches'); return; }
+    if (!activeSearches || activeSearches.length == 0) { 
+        //console.log('No active searches'); 
+        return; 
+    }
     activeSearch = activeSearches[0];
 
 
     tabParent = document.getElementById('search-tabs');
     if (!searchParent) {
-        console.log("No parent element")
+        //console.log("No parent element")
         return;
     }
     const tabs = tabParent.getElementsByTagName('a');

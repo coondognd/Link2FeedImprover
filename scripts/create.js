@@ -16,7 +16,7 @@
         // First visit
         if (document.getElementById('intake_personal_type_firstFoodBankVisit_selector').selectedIndex == 0) {
 
-            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').options[1].selected = true;
+            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').options[3].selected = true;
             var evt = document.createEvent("HTMLEvents");
             evt.initEvent('change', true, true );
             document.getElementById('intake_personal_type_firstFoodBankVisit_selector').dispatchEvent(evt);
@@ -37,6 +37,8 @@
             document.getElementById('intake_personal_type-identity-document-template').innerHTML = barcodeTemplate;
         }
 
+        /*
+        // Ethnicity
         const targetNode = document.getElementById("hh-member-modal-container" );
         // Options for the observer (which mutations to observe)
         const config = { attributes: true, childList: false, subtree: false };
@@ -64,7 +66,7 @@
         const observer = new MutationObserver(callback);
         // Start observing the target node for configured mutations
         observer.observe(targetNode, config);
-    
+        */
 
         // Some changes can only happen after page loads.
         // TODO: Change from timeout to something more reliably
@@ -86,9 +88,12 @@
 
             // Correct "Croton-on Hudson"
             // Only a problem for some users early on in L2F
-            document.getElementById('intake_personal_type_household_address_city').value = document.getElementById('intake_personal_type_household_address_city').value.replace("Croton-on Hudson", "Croton-on-Hudson");
+            let crotonFix = document.getElementById('intake_personal_type_household_address_city').value;
+            crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+            document.getElementById('intake_personal_type_household_address_city').value = crotonFix;
     
-
             // Put focus back at top
             if (stoleFocus) {
                 window.scrollTo(0,0);
@@ -168,6 +173,7 @@
                 document.getElementById('client_income_is_primary_new0').checked= true;
             }
         }
+    /*
     } else if (document.location.href.indexOf("/page/dietary-considerations") > -1) {
         function afterDelay() {
 
@@ -177,4 +183,5 @@
 
         }
         window.setTimeout(afterDelay, 500);
+    */
     }
