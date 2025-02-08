@@ -17,27 +17,27 @@ document.getElementById("quick-click-panel").style.display = 'none';
 /*
  *  Setup to notify on large households
  */
-let largeFamilyCheckAttempts = 0;
-function resetPostCheckinDisplay() {
-    largeFamilyCheckAttempts = 0
-}
-function updatePostCheckinDisplay() {
+function updatePostCheckinDisplay(lastClientName, attemptNumber) {
+    if (!attemptNumber) {
+        attemptNumber = 1;
+    }
 // quick-click-visit-history-table
     var mostRecentVisitorLink = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(2) > a");
-    console.log("Most Recent Vistor Link Element: ", mostRecentVisitorLink)
-    console.log("Checking for " + lastClientName)
-    if (mostRecentVisitorLink && mostRecentVisitorLink.innerText.indexOf(lastClientName > 1)) {
-        console.log("Found most recent client. Looking for household size");
+    //console.log("Most Recent Vistor Link Element: ", mostRecentVisitorLink)
+    //console.log("Checking for " + lastClientName)
+    //console.log("Name to compare: " +  mostRecentVisitorLink.innerText)
+    if (mostRecentVisitorLink && mostRecentVisitorLink.innerText.indexOf(lastClientName) > -1) {
+        //console.log("Found most recent client. Looking for household size");
         mostRecentHouseHoldElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(3)");
-        console.log(mostRecentHouseHoldElement)
+        //console.log(mostRecentHouseHoldElement)
         if (mostRecentHouseHoldElement) {
-            console.log("Extracting number")
+            //console.log("Extracting number")
             const re = /Household Size: (\d+)/i;
             const found = mostRecentHouseHoldElement.innerText.match(re);
-            console.log("Found ", found)
+            //console.log("Found ", found)
             if (found.length > 0) {
                 houseHoldSize = found[1];
-                console.log("Household size: " + houseHoldSize)
+                //console.log("Household size: " + houseHoldSize)
                 houseHoldSize -= 0;
                 /* End large family prep */
                 let largeFamilyDiv = document.getElementById('largeFamilyDiv');
@@ -57,16 +57,16 @@ function updatePostCheckinDisplay() {
             }
         }
     } else {
-        console.log("Couldn't find the family size.")
-        if (largeFamilyCheckAttempts++ < 3) {
-            console.log("Retrying shortly");
-            setTimeout(updatePostCheckinDisplay, 500)
+        //console.log("Couldn't find the family size.")
+        if (attemptNumber <= 3) {
+            attemptNumber++;
+            //console.log("Retrying shortly");
+            setTimeout(function() {updatePostCheckinDisplay(lastClientName, attemptNumber)}, 500)
         } else {
-            console.log("Max attempts reached.  Not retrying")
+            //console.log("Max attempts reached.  Not retrying")
         }
     }
 }
-var lastClientName = null;
 /*
  * Esignature modal
  */
@@ -80,16 +80,7 @@ const callback = (mutationList, observer) => {
         if (mutation.type === "attributes") {
             
             if (targetNode.style.display !== "none") {
-                /* Prep to determine if this a large family */
-                console.log("Open eSig modal")
-                resetPostCheckinDisplay()
-                // Get client name
-                const nameElements = document.querySelectorAll("#esignature-modal .client-name")
-                if (nameElements && nameElements.length) {
-                    nameElement = nameElements[0];
-                    lastClientName = nameElement.innerText.trim();
-                    console.log("Found client name: " + lastClientName)
-                }
+                //console.log("Open eSig modal")
 
                 /*
                 document.getElementById('quick_click-form-esig-signature-type').options[2].selected = true;
@@ -130,8 +121,18 @@ const visitRecordingCallback = (mutationList, observer) => {
         if (mutation.type === "attributes") {
             
             if (visitRecordingTargetNode.style.display !== "none") {
-                console.log("Opened post-checkin modal");
-                updatePostCheckinDisplay()
+                //console.log("Opened post-checkin modal");
+                const nameElements = document.querySelectorAll("#modal-visit-recording .client-name")
+                if (nameElements && nameElements.length) {
+                    const nameElement = nameElements[0];
+                    const labelAndName = nameElement.innerText.split(":");
+                    if (labelAndName.length > 0) {
+                        const lastClientName = labelAndName[1].trim();
+                        //console.log("Found client name: " + lastClientName);
+                        updatePostCheckinDisplay(lastClientName)
+                    }
+                }
+
             }
         }
     }
