@@ -12,6 +12,8 @@ function checkSearch() {
     const INTENT_BARCODE = 1;
     //const INTENT_PHONE = 2;
     const barCodeStart = '9918';
+    
+    errorDisplayElement.innerHTML = '&nbsp;';
 
     searchParent = document.getElementById('search-forms');
     if (!searchParent) {
@@ -70,7 +72,7 @@ function checkSearch() {
 
     const valSoFar = document.getElementById('intake_search_' + activeSearch.id).value;
     if (valSoFar == '') {
-        errorDisplayElement.innerText = '';
+        errorDisplayElement.innerHTML = '&nbsp;';
     }
 
     let intent = null;
@@ -181,7 +183,7 @@ var observer = new MutationObserver(function (event) {
         errorDisplayElement.innerText = 'Searching...';
     }
     if (state == SEARCHING && e.classList.contains('ui-autocomplete-loading')) {
-        //console.log("Still searching");
+        errorDisplayElement.innerText = 'Searching...';
     }
     if (state == SEARCHING && !e.classList.contains('ui-autocomplete-loading')) {
         var found = false;
@@ -192,7 +194,7 @@ var observer = new MutationObserver(function (event) {
             }
         }
         if (found) {
-            errorDisplayElement.innerText = '';
+            errorDisplayElement.innerHTML = '&nbsp;';
         } else {
             errorDisplayElement.innerText = 'No results';
         }
