@@ -13,15 +13,6 @@
             document.forms['intake_personal_type']['intake_personal_type[consentWritten]'].value = 1;
         } 
 
-        // First visit
-        if (document.getElementById('intake_personal_type_firstFoodBankVisit_selector').selectedIndex == 0) {
-
-            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').options[3].selected = true;
-            var evt = document.createEvent("HTMLEvents");
-            evt.initEvent('change', true, true );
-            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').dispatchEvent(evt);
-
-        }
 
         // Phone Number
         if (document.getElementById('client-contact-item-phone-template')) {
@@ -71,6 +62,17 @@
         // Some changes can only happen after page loads.
         // TODO: Change from timeout to something more reliably
         function afterDelay() {
+
+            // First visit
+            if (document.getElementById('intake_personal_type_firstFoodBankVisit_selector').selectedIndex == 0) {
+
+                document.getElementById('intake_personal_type_firstFoodBankVisit_selector').options[3].selected = true;
+            
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent('change', true, true );
+                document.getElementById('intake_personal_type_firstFoodBankVisit_selector').dispatchEvent(evt);
+
+            }
 
             let stoleFocus = false;
             // Open phone and barcode fields.  Will steal focus
