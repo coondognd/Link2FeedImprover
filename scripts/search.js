@@ -106,9 +106,14 @@ function checkSearch() {
         }
         document.getElementById(correctElementNames[intent].search).value = valSoFar;
         document.getElementById(correctElementNames[actual].search).value = "";
-        //var evt = document.createEvent("HTMLEvents");
-        //evt.initEvent('keyup', true, true);
-        //document.getElementById(correctElementNames[intent].search).dispatchEvent(evt);
+        document.getElementById(correctElementNames[actual].search).style.backgroundColor ="#ffffff";
+        //document.getElementById(correctElementNames[intent].search).closest('form').submit();
+        const event = new KeyboardEvent('keydown', {
+            key: '4', // actual key is arbitrary
+            bubbles: true,
+            cancelable: true
+          });
+        document.getElementById(correctElementNames[intent].search).dispatchEvent(event);
         return;
 
     }
