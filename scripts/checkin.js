@@ -143,14 +143,5 @@ const visitRecordingObserver = new MutationObserver(visitRecordingCallback);
 visitRecordingObserver.observe(visitRecordingTargetNode, visitRecordingConfig);
 
 
-// If we stay on the page too long, the cookie expires.
-// So call a URL that updates the cookie every so often
-function keepAlive() {
-    console.log("Keeping session alive");
-    now = new Date();    
-    fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors'});
-}
-setInterval(keepAlive, 10 * 60 * 1000);
-
 
 

@@ -89,25 +89,20 @@ function checkSearch() {
 
 
     if (intent !== actual && intent != null) {
-        /*
-        correctElementNames.forEach((elementName) => {
-            document.getElementById(elementName.search).classList.remove('active');
-        })
-        */
-        //document.getElementById(correctElementNames[INTENT].search).classList.add('active');
 
+        // Switch tabs
         for (let tab of tabs) {
-            //tab.parentNode.classList.remove('active');
-            //console.log("Comparing " + tab.attributes.href.value + " and " + correctElementNames[intent].tab);
             if (tab.attributes.href.value == correctElementNames[intent].tab) {
                 //tab.parentNode.classList.add('active');
                 tab.click();
             }
         }
+        // Copy the value over to the new tab
         document.getElementById(correctElementNames[intent].search).value = valSoFar;
+        // Reset the old tab
         document.getElementById(correctElementNames[actual].search).value = "";
         document.getElementById(correctElementNames[actual].search).style.backgroundColor ="#ffffff";
-        //document.getElementById(correctElementNames[intent].search).closest('form').submit();
+        // Nudge the autocomplete service to do a search
         const event = new KeyboardEvent('keydown', {
             key: '4', // actual key is arbitrary
             bubbles: true,
@@ -147,30 +142,6 @@ document.getElementById('intake_search_client_barcode_search_handler').addEventL
 document.getElementById('intake_search_client_id_search_handler').addEventListener('keyup', checkSearch);
 document.getElementById('barcode-scan-btn').innerHTML = document.getElementById('barcode-scan-btn').innerHTML.replace('Scan Barcode', 'Scan with Webcam');
 
-/*
-How to check when search is done
-Check the 'intake_search_client_search_handler' event for when the 'ui-autocomplete-loading' class is removed
-Check if the dropdown is there.  If not, no results were found
-
-Some script I found on the internet thath doesn't do anything yet:
-
-var e = document.getElementById('intake_search_client_search_handler')
-var observer = new MutationObserver(function (event) {
-  console.log(event)   
-})
-
-observer.observe(e, {
-  attributes: true, 
-  attributeFilter: ['class'],
-  childList: false, 
-  characterData: false
-})
-
-setTimeout(function () {
-  e.className = 'hello'
-}, 1000)
-
-*/
 
 /*
  *  Let the user know if the search is still going or not
@@ -204,6 +175,7 @@ var observer = new MutationObserver(function (event) {
             errorDisplayElement.innerText = 'No results';
         }
     }
+    // TODO: Clear out errorDisplayElement when switching tabs
 })
 
 
@@ -230,3 +202,13 @@ for (clientSearchElement of clientSearchElements) {
 /*
  *   End Search-still-going logic
  */ 
+
+
+// If we stay on the page too long, the cookie expires.
+// So call a URL that updates the cookie every so often
+function keepAlive() {
+    console.log("Keeping session alive");
+    now = new Date();    
+    fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors'});
+}
+setInterval(keepAlive, 10 * 60 * 1000);
