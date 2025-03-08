@@ -1,5 +1,32 @@
     //https://portal.link2feed.com/org/27075/intake/14852358/page/personal
 
+
+    const API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
+
+    function recordCheckin(clientId, sessionDate) {
+        const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+        
+        fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": authHeader,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                clientid: clientId,
+                session_date: sessionDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response:", data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+    
+
     const barCodeStart = '9918';
     // Precheck all the fields!
 
@@ -136,6 +163,8 @@
             }
         }
         // TODO: Make an age box, and set date and check approximate box  
+
+        // TODO: Monitor address for "Croton on Hudson", and add dashes
     } else if (document.location.href.indexOf("/page/monthly-income") > -1) {
         const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
         const clientIdEndSpot = document.location.href.indexOf('/page/monthly-income');
@@ -186,4 +215,26 @@
         }
         window.setTimeout(afterDelay, 500);
     */
+    } else if (document.location.href.indexOf('visit_recorded=1') > -1) {
+        // Record checkins
+        function afterDelay() {
+
+            const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
+            const clientIdEndSpot = document.location.href.indexOf('/page/services');
+            const clientId = document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
+            console.log("Client: " + clientId);
+            const sessionDateElement = document.querySelector("#client-visit-events-" + clientId + " > tbody > tr.odd > td.sorting_1");
+            console.log(sessionDateElement);
+            if (sessionDateElement) {
+                const sessionDateMMDDYY = sessionDateElement.innerText
+                // Change mm-dd-YYYY to YYYY-mm-dd
+                const sessionDateParts = sessionDateMMDDYY.split("-");
+                if (sessionDateParts.length > 2) {
+                    const sessionDate = sessionDateParts[2] + "-" + sessionDateParts[0] + "-" + sessionDateParts[1];
+                    recordCheckin(clientId, sessionDate);
+                }
+            }
+
+        }
+        window.setTimeout(afterDelay, 1000);
     }

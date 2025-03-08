@@ -14,6 +14,33 @@ if (referenceElement && elementToMove) {
 document.getElementById("quick-click-panel").style.display = 'none';
 
 
+const API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
+
+function recordCheckin(clientId, sessionDate) {
+    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+    
+    fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Authorization": authHeader,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            clientid: clientId,
+            session_date: sessionDate
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Response:", data);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+
+
 /*
  *  Setup to notify on large households
  */
@@ -28,6 +55,11 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
     //console.log("Name to compare: " +  mostRecentVisitorLink.innerText)
     if (mostRecentVisitorLink && mostRecentVisitorLink.innerText.indexOf(lastClientName) > -1) {
         //console.log("Found most recent client. Looking for household size");
+        // Example usage:
+        clientIdElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(1) > a");
+        if (clientIdElement) {
+            recordCheckin(clientIdElement.innerText.trim(), new Date().toISOString().split('T')[0]);
+        }
         mostRecentHouseHoldElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(3)");
         //console.log(mostRecentHouseHoldElement)
         if (mostRecentHouseHoldElement) {
@@ -114,6 +146,7 @@ const visitRecordingTargetNode = document.getElementById("modal-visit-recording"
 // Options for the observer (which mutations to observe)
 const visitRecordingConfig = { attributes: true, childList: false, subtree: false };
 
+var modalAlreadyOpen = false;
 // Callback function to execute when mutations are observed
 const visitRecordingCallback = (mutationList, observer) => {
     for (const mutation of mutationList) {
@@ -122,7 +155,8 @@ const visitRecordingCallback = (mutationList, observer) => {
             if (visitRecordingTargetNode.style.display !== "none") {
                 //console.log("Opened post-checkin modal");
                 const nameElements = document.querySelectorAll("#modal-visit-recording .client-name")
-                if (nameElements && nameElements.length) {
+                if (nameElements && nameElements.length && !modalAlreadyOpen) {
+                    modalAlreadyOpen = true;
                     const nameElement = nameElements[0];
                     const labelAndName = nameElement.innerText.split(":");
                     if (labelAndName.length > 0) {
@@ -132,6 +166,8 @@ const visitRecordingCallback = (mutationList, observer) => {
                     }
                 }
 
+            } else {
+                modalAlreadyOpen = false;
             }
         }
     }
@@ -141,7 +177,3 @@ const visitRecordingCallback = (mutationList, observer) => {
 const visitRecordingObserver = new MutationObserver(visitRecordingCallback);
 // Start observing the target node for configured mutations
 visitRecordingObserver.observe(visitRecordingTargetNode, visitRecordingConfig);
-
-
-
-
