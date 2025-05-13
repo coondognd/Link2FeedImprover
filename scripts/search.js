@@ -215,4 +215,4 @@ function keepAlive() {
         console.log("Session keep-alive failed");
     }
 }
-setInterval(keepAlive, 10 * 60 * 1000);
+setInterval(keepAlive, 2 * 60 * 1000);
