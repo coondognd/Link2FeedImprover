@@ -207,8 +207,12 @@ for (clientSearchElement of clientSearchElements) {
 // If we stay on the page too long, the cookie expires.
 // So call a URL that updates the cookie every so often
 function keepAlive() {
-    console.log("Keeping session alive");
     now = new Date();    
-    fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors'});
+    try {
+        fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors'});
+        console.log("Session keep-alive success");
+    } catch {
+        console.log("Session keep-alive failed");
+    }
 }
 setInterval(keepAlive, 10 * 60 * 1000);

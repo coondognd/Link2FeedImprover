@@ -1,6 +1,34 @@
     //https://portal.link2feed.com/org/27075/intake/14852358/page/personal
 
 
+    /* 
+    * TODO: Remove unneeded tabs (e.g. "Assess")
+    * TODO: Replace "Croton on Hudson" on input field onChange. (Avoid infinite loop)
+    * TODO; Add custom improved error messages.  e.g. "Recertification required" vs "Review required"
+    */
+
+    
+    function observeElement(element, property, callback, delay = 0) {
+        let elementPrototype = Object.getPrototypeOf(element);
+        if (elementPrototype.hasOwnProperty(property)) {
+            let descriptor = Object.getOwnPropertyDescriptor(elementPrototype, property);
+            Object.defineProperty(element, property, {
+                get: function() {
+                    return descriptor.get.apply(this, arguments);
+                },
+                set: function () {
+                    let oldValue = this[property];
+                    descriptor.set.apply(this, arguments);
+                    let newValue = this[property];
+                    if (typeof callback == "function") {
+                        setTimeout(callback.bind(this, oldValue, newValue), delay);
+                    }
+                    return newValue;
+                }
+            });
+        }
+    }
+
     const API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
 
     function recordCheckin(clientId, sessionDate) {
@@ -55,6 +83,48 @@
             document.getElementById('intake_personal_type-identity-document-template').innerHTML = barcodeTemplate;
         }
 
+        let townBox = document.querySelector("#intake_personal_type_household_address_city");
+
+        townBox.addEventListener("input", function () {
+            console.log("Input value changed via UI. New value: '%s'", this.value);
+            let crotonFix = this.value;
+            crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+            if (crotonFix != this.value) { // Avoid infinite loop
+                this.value = crotonFix;
+            }
+        });
+        
+        observeElement(townBox, "value", function (oldValue, newValue) {
+            console.log("Input value changed via API. Value changed from '%s' to '%s'", oldValue, newValue);
+            let crotonFix = newValue;
+            crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
+            crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+            if (crotonFix != newValue) { // Avoid infinite loop
+                townBox.value = crotonFix;
+            }
+
+        });
+
+
+        // Alerts 
+        let alerts = document.querySelectorAll(".alert .pull-left");
+        let tefapRequired = false;
+        for (const alert of alerts) {
+            if (alert.innerText === "Recertification Required") {
+                alert.innerText = "TEFAP Recertification Required. Give client TEFAP form";
+                tefapRequired = true;
+            } else if (alert.innerText === "Profile Review Required") {
+                let alertParent = alert.closest(".alert");
+                if (tefapRequired) { 
+                    alertParent.remove(); // No need for multiple alerts
+                } else {
+                    alert.innerText = "Profile Review Required. TEFAP FORM NOT NEEDED";
+                }
+            }
+        }
         /*
         // Ethnicity
         const targetNode = document.getElementById("hh-member-modal-container" );
