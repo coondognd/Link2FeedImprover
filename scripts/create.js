@@ -3,8 +3,7 @@
 
     /* 
     * TODO: Remove unneeded tabs (e.g. "Assess")
-    * TODO: Replace "Croton on Hudson" on input field onChange. (Avoid infinite loop)
-    * TODO; Add custom improved error messages.  e.g. "Recertification required" vs "Review required"
+    * TODO: Highlight clients in autocomplete who have been there before
     */
 
     
@@ -292,9 +291,9 @@
             const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
             const clientIdEndSpot = document.location.href.indexOf('/page/services');
             const clientId = document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
-            console.log("Client: " + clientId);
+
             const sessionDateElement = document.querySelector("#client-visit-events-" + clientId + " > tbody > tr.odd > td.sorting_1");
-            console.log(sessionDateElement);
+
             if (sessionDateElement) {
                 const sessionDateMMDDYY = sessionDateElement.innerText
                 // Change mm-dd-YYYY to YYYY-mm-dd

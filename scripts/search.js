@@ -1,4 +1,5 @@
 
+const previousClients = new Set();
 
 const searchFormElement = document.getElementById('search-forms');
 const newDiv = document.createElement("div");
@@ -12,7 +13,7 @@ function checkSearch() {
     const INTENT_BARCODE = 1;
     //const INTENT_PHONE = 2;
     const barCodeStart = '9918';
-    
+
     errorDisplayElement.innerHTML = '&nbsp;';
 
     searchParent = document.getElementById('search-forms');
@@ -21,9 +22,9 @@ function checkSearch() {
         return;
     }
     activeSearches = searchParent.getElementsByClassName('active');
-    if (!activeSearches || activeSearches.length == 0) { 
+    if (!activeSearches || activeSearches.length == 0) {
         //console.log('No active searches'); 
-        return; 
+        return;
     }
     activeSearch = activeSearches[0];
 
@@ -101,13 +102,13 @@ function checkSearch() {
         document.getElementById(correctElementNames[intent].search).value = valSoFar;
         // Reset the old tab
         document.getElementById(correctElementNames[actual].search).value = "";
-        document.getElementById(correctElementNames[actual].search).style.backgroundColor ="#ffffff";
+        document.getElementById(correctElementNames[actual].search).style.backgroundColor = "#ffffff";
         // Nudge the autocomplete service to do a search
         const event = new KeyboardEvent('keydown', {
             key: '4', // actual key is arbitrary
             bubbles: true,
             cancelable: true
-          });
+        });
         document.getElementById(correctElementNames[intent].search).dispatchEvent(event);
         return;
 
@@ -142,6 +143,28 @@ document.getElementById('intake_search_client_barcode_search_handler').addEventL
 document.getElementById('intake_search_client_id_search_handler').addEventListener('keyup', checkSearch);
 document.getElementById('barcode-scan-btn').innerHTML = document.getElementById('barcode-scan-btn').innerHTML.replace('Scan Barcode', 'Scan with Webcam');
 
+/*
+<ul id="ui-id-3" tabindex="0" class="ui-menu ui-widget ui-widget-content ui-autocomplete ui-front" style="display: none; width: 569.497px; top: 359.913px; left: 135.296px;">
+<li class="ui-menu-item"><a href="/org/27075/intake/10130808/page/personal?search=true?search=true" id="ui-id-28" tabindex="-1" class="ui-menu-item-wrapper">
+                    <div class="row">                        
+                    <div class="col-md-8 col-sm-8 col-xs-8">test, adult</div>                        
+                    <div class="col-md-3 col-sm-4 col-xs-4 text-right align-right">01-01-1972</div>  
+                    </div>                </a></li></ul>
+*/
+function highlightPastUsers(resultsElement) {
+    const clientLinks = resultsElement.querySelectorAll('a.ui-menu-item-wrapper');
+    const re = /intake\/(\d+)\/page/i;
+    clientLinks.forEach((clientLink) => {
+        const href = clientLink.getAttribute('href');
+        const found = href.match(re);
+        if (found.length > 0) {
+            const clientId = found[1];
+            if (previousClients.has(clientId)) {
+                clientLink.style.backgroundColor = '#ccffcc';
+            }
+        }
+    });
+}
 
 /*
  *  Let the user know if the search is still going or not
@@ -149,7 +172,7 @@ document.getElementById('barcode-scan-btn').innerHTML = document.getElementById(
 const STANDBY = 0;
 const SEARCHING = 1;
 const searchResultDropdownElements = document.getElementsByClassName('ui-autocomplete');
-var state = STANDBY
+var state = STANDBY;
 
 
 var observer = new MutationObserver(function (event) {
@@ -165,6 +188,7 @@ var observer = new MutationObserver(function (event) {
         var found = false;
         for (searchResultDropdownElement of searchResultDropdownElements) {
             if (searchResultDropdownElement.style.display !== 'none') {
+                highlightPastUsers(searchResultDropdownElement);
                 found = true;
                 break;
             }
@@ -201,18 +225,62 @@ for (clientSearchElement of clientSearchElements) {
 
 /*
  *   End Search-still-going logic
- */ 
+ */
+
+
+// Get clients who have visited in the past
+
+const CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/clients.php";
+
+async function fetchClients() {
+    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+
+
+    try {
+        const response = await fetch(CLIENTS_API_URL, {
+            method: "GET",
+            headers: {
+                "Authorization": authHeader,
+                "Content-Type": "application/json"
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const clients = await response.json();
+        return clients;
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+
+const previousClientsString = sessionStorage.getItem("previousClients");
+let previousClientsArray = [];
+if (previousClientsString) {
+    previousClientsArray = JSON.parse(previousClientsString);
+} else {
+    fetchClients().then((clients) => {
+        if (clients) {
+            sessionStorage.setItem("previousClients", JSON.stringify(clients))
+        }
+    }).catch(() => { })
+}
+previousClientsArray.forEach((previousClientID) => {
+    previousClients.add(previousClientID, 1);
+})
 
 
 // If we stay on the page too long, the cookie expires.
 // So call a URL that updates the cookie every so often
 function keepAlive() {
-    now = new Date();    
+    now = new Date();
     try {
-        fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors'});
-        console.log("Session keep-alive success");
+        fetch("https://accounts.link2feed.com/org/27075/announcements/icon?" + now.getTime(), { mode: 'no-cors' });
+        console.log("Session keep-alive success. " + now);
     } catch {
-        console.log("Session keep-alive failed");
+        console.log("Session keep-alive failed. " + now);
     }
 }
 setInterval(keepAlive, 2 * 60 * 1000);

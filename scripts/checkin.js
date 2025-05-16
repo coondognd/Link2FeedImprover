@@ -1,3 +1,4 @@
+
 /*
  *  Move Searchbox up
  */
@@ -14,12 +15,12 @@ if (referenceElement && elementToMove) {
 document.getElementById("quick-click-panel").style.display = 'none';
 
 
-const API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
+const CHECKIN_API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
 
 function recordCheckin(clientId, sessionDate) {
     const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
     
-    fetch(API_URL, {
+    fetch(CHECKIN_API_URL, {
         method: "POST",
         headers: {
             "Authorization": authHeader,
