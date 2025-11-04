@@ -53,10 +53,172 @@ function recordCheckin(clientId, sessionDate) {
         });
 }
 
+function checkIn() {
+
+    console.log("Checking In...");
+    //const todayYYYYMMDD = new Date().toISOString().split('T')[0];
+
+    const date = new Date(); 
+
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
+    const day = date.getDate().toString().padStart(2, '0');
+
+    const todayYYYYMMDD = `${year}-${month}-${day}`;
+
+
+    const formData = new FormData();
+    formData.append('clientIds[]', getClientIdFromURL());
+    formData.append('visit_details[0][visit_date]', todayYYYYMMDD);
+    formData.append('visit_details[0][program_id]', '11104');
+    formData.append('visit_details[0][sign_type]', 'verbal_consent');
+    formData.append('visit_details[0][typed_signature]', '');
+    formData.append('visit_details[0][pre_typed]', '');
+    formData.append('visit_details[0][signed_canvas]', '');
+    formData.append('visit_details[0][signatory]', '');
+    formData.append('visit_details[0][signatory_other]', '');
+    formData.append('visit_details[0][sign_date]', todayYYYYMMDD);
+    formData.append('visit_details[0][quick_click]', 'true');
+    console.log("Form data prepared:", formData);
+    //clientIds%5B%5D=14764723&visit_details%5B0%5D%5Bvisit_date%5D=2025-11-03&visit_details%5B0%5D%5Bprogram_id%5D=11104&visit_details%5B0%5D%5Bsign_type%5D=verbal_consent&visit_details%5B0%5D%5Btyped_signature%5D=&visit_details%5B0%5D%5Bpre_typed%5D=&visit_details%5B0%5D%5Bsigned_canvas%5D=&visit_details%5B0%5D%5Bsignatory%5D=&visit_details%5B0%5D%5Bsignatory_other%5D=&visit_details%5B0%5D%5Bsign_date%5D=2025-11-03&visit_details%5B0%5D%5Bquick_click%5D=true
+
+    const button = document.getElementById("updateAndCheckIn");
+    // Post data using the Fetch API
+    fetch('https://portal.link2feed.com/org/27075/foodbank/standard-foodbank-visit-attendance', {
+        method: 'POST',
+        body: formData
+    })
+
+        // We turn the response into text as we expect HTML
+        .then((res) => res.text())
+
+        // Let's turn it into an HTML document
+        .then((text) => new DOMParser().parseFromString(text, 'text/html'))
+
+        // Now we have a document to work with let's replace the <form>
+        .then((doc) => {
+            button.innerText = "Done!";
+        })
+        .catch((err) => {
+            // Some form of connection failure
+            button.innerText = "Whoops, that didn't work!";
+            console.error("Error submittin gcheckIn:", err);
+            console.log("Checkin Result: ", res);
+            console.log("Checkin text: ", text);
+        }).finally(() => { });
+}
+
+//function changeToAsync(e) {
+function submitFormAsync() {
+    console.log("Submitting");
+    //console.log(e.target);
+    // Prevent the default form submit
+    //e.preventDefault();
+    //e.stopPropagation();
+
+    // Store reference to form to make later code easier to read
+    //const form = e.target;
+
+    const form = document.getElementById("intake_personal_type");
+    const button = document.getElementById("updateAndCheckIn");
+
+    console.log("Submitting form asynchronously");
+    // Post data using the Fetch API
+    fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+    })
+        // We turn the response into text as we expect HTML
+        .then((res) => res.text())
+
+        // Let's turn it into an HTML document
+        .then((text) => new DOMParser().parseFromString(text, 'text/html'))
+
+        // Now we have a document to work with let's replace the <form>
+        .then((doc) => {
+
+            /*
+            // Create result message container and copy HTML from doc
+            const result = document.createElement('div');
+            result.innerHTML = doc.body.innerHTML;
+
+            // Allow focussing this element with JavaScript
+            result.tabIndex = -1;
+
+            // And replace the form with the response children
+            form.parentNode.replaceChild(result, form);
+
+            // Move focus to the status message
+            result.focus();
+            */
+            console.log("Profile updated.  Checking In...");
+            console.log("Doc: ", doc);
+
+            const button = document.getElementById("updateAndCheckIn");
+            button.innerText = "Checking In...";
+            checkIn();
+
+
+        })
+        .catch((err) => {
+            // Some form of connection failure
+            button.innerText = "Whoops, that didn't work!";
+            console.error("Error submitting form asynchronously:", err);
+            console.log("Result: ", res);
+            console.log("Result text: ", text);
+
+        }).finally(() => {
+            //form.removeEventListener('submit', changeToAsync);
+        });
+
+    // Make sure connection failure message is hidden
+    //form.querySelector('[role=alert]').hidden = true;
+    // return false;
+
+};
+
+function updateAndCheckIn() {
+    const button = document.getElementById("updateAndCheckIn");
+    button.disabled = true;
+    button.innerText = "Updating profile...";
+
+    const checkboxes = document.querySelectorAll("input[name='intake_personal_type[ethnicities][]']");
+    const selectedEthnicities = Array.from(checkboxes)
+        .filter(checkbox => checkbox.checked)
+        .map(checkbox => checkbox.value);
+    // First, Check that the Ethnicity field has been set
+    if (selectedEthnicities.length == 0) {
+        // If not, select "Other"
+        const ethnicityParentElement = document.getElementsByClassName("ethnicities")[0];
+        ethnicityParentElement.querySelector("input[data-type-name=other]").checked = true;
+    }
+    form = document.getElementById("intake_personal_type");
+    console.log("Chaging form submission to async");
+    //form.addEventListener('submit', changeToAsync);
+    //console.log("Clicking Save button");
+    //document.getElementById("intake-wizard-save-btn").click();
+    //form.submit();
+    //form.requestSubmit();
+    submitFormAsync();
+}
 
 const barCodeStart = '9918';
 // Precheck all the fields!
 
+function getClientIdFromURL() {
+    const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
+    const clientIdEndSpot = document.location.href.indexOf('/page/');
+    return document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
+}
+
+function fixCroton(townName) {
+
+    townName = townName.replace("Croton-on Hudson", "Croton-on-Hudson");
+    townName = townName.replace("Croton on-Hudson", "Croton-on-Hudson");
+    townName = townName.replace("Croton on Hudson", "Croton-on-Hudson");
+
+    return townName;
+}
 
 if (document.location.href.indexOf('/page/personal') > -1) {
     //  Consents
@@ -87,10 +249,7 @@ if (document.location.href.indexOf('/page/personal') > -1) {
     let townBox = document.querySelector("#intake_personal_type_household_address_city");
     townBox.addEventListener("input", function () {
         console.log("Input value changed via UI. New value: '%s'", this.value);
-        let crotonFix = this.value;
-        crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+        let crotonFix = fixCroton(this.value);
         if (crotonFix != this.value) { // Avoid infinite loop
             this.value = crotonFix;
         }
@@ -98,10 +257,7 @@ if (document.location.href.indexOf('/page/personal') > -1) {
 
     observeElement(townBox, "value", function (oldValue, newValue) {
         console.log("Input value changed via API. Value changed from '%s' to '%s'", oldValue, newValue);
-        let crotonFix = newValue;
-        crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+        let crotonFix = fixCroton(newValue);
         if (crotonFix != newValue) { // Avoid infinite loop
             townBox.value = crotonFix;
         }
@@ -110,10 +266,7 @@ if (document.location.href.indexOf('/page/personal') > -1) {
     const addressBox = document.getElementById('intake_personal_type_household_address_addressLine1');
     if (addressBox) {
         addressBox.addEventListener('blur', function () {
-            let crotonFix = townBox.value;
-            crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
-            crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
-            crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+            let crotonFix = fixCroton(townBox.value);
             if (crotonFix != townBox.value) { // Avoid infinite loop
                 townBox.value = crotonFix;
             }
@@ -133,10 +286,26 @@ if (document.location.href.indexOf('/page/personal') > -1) {
             if (tefapRequired) {
                 alertParent.remove(); // No need for multiple alerts
             } else {
-                alert.innerText = "Profile Review Required. TEFAP FORM NOT NEEDED";
+                alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";
+                alertHTML += "<button  id='updateAndCheckIn'>Kevin's SuperFix Button</button>";
+
+
+                alert.innerHTML = alertHTML;
+
+                superFixButton = document.getElementById("updateAndCheckIn");
+                superFixButton.addEventListener("click", updateAndCheckIn);
             }
         }
     }
+
+    // DEBUGGING
+    /*
+    debugElement = document.getElementById('current-client-name');
+    debugElement.innerHTML +="<button  id='updateAndCheckIn'>Kevin's SuperFix Button</button>";
+    superFixButton = document.getElementById("updateAndCheckIn");
+    superFixButton.addEventListener("click", updateAndCheckIn);
+    */
+
     /*
     // Ethnicity
     const targetNode = document.getElementById("hh-member-modal-container" );
@@ -198,10 +367,7 @@ if (document.location.href.indexOf('/page/personal') > -1) {
         //document.getElementById('intake_personal_type_ethnicities_18513').checked = true; 
 
         // Correct "Croton-on Hudson"
-        let crotonFix = document.getElementById('intake_personal_type_household_address_city').value;
-        crotonFix = crotonFix.replace("Croton-on Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on-Hudson", "Croton-on-Hudson");
-        crotonFix = crotonFix.replace("Croton on Hudson", "Croton-on-Hudson");
+        let crotonFix = fixCroton(document.getElementById('intake_personal_type_household_address_city').value);
         document.getElementById('intake_personal_type_household_address_city').value = crotonFix;
 
         // Put focus back at top
@@ -247,9 +413,7 @@ if (document.location.href.indexOf('/page/personal') > -1) {
 
     // TODO: Monitor address for "Croton on Hudson", and add dashes
 } else if (document.location.href.indexOf("/page/monthly-income") > -1) {
-    const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
-    const clientIdEndSpot = document.location.href.indexOf('/page/monthly-income');
-    const clientId = document.location.href.substring(clientIdStartSpot, clientIdEndSpot);
+    const clientId = getClientIdFromURL();
 
     // Autocomplete income portion
     // Click Add, select Undisclosed
