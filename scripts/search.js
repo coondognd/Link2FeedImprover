@@ -161,6 +161,7 @@ function highlightPastUsers(resultsElement) {
             const clientId = found[1];
             if (previousClients.has(clientId)) {
                 clientLink.style.backgroundColor = '#ccffcc';
+                clientLink.style.color = '#000000';
             }
         }
     });
