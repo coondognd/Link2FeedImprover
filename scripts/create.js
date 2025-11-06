@@ -102,7 +102,7 @@ function checkIn() {
         .catch((err) => {
             // Some form of connection failure
             button.innerText = "Whoops, that didn't work!";
-            console.error("Error submittin gcheckIn:", err);
+            console.error("Error submitting checkIn:", err);
             console.log("Checkin Result: ", res);
             console.log("Checkin text: ", text);
         }).finally(() => { });
@@ -193,7 +193,6 @@ function updateAndCheckIn() {
         ethnicityParentElement.querySelector("input[data-type-name=other]").checked = true;
     }
     form = document.getElementById("intake_personal_type");
-    console.log("Chaging form submission to async");
     //form.addEventListener('submit', changeToAsync);
     //console.log("Clicking Save button");
     //document.getElementById("intake-wizard-save-btn").click();
@@ -203,7 +202,7 @@ function updateAndCheckIn() {
 }
 
 const barCodeStart = '9918';
-// Precheck all the fields!
+
 
 function getClientIdFromURL() {
     const clientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length

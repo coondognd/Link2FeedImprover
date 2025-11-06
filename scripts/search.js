@@ -198,6 +198,7 @@ var observer = new MutationObserver(function (event) {
             errorDisplayElement.innerHTML = '&nbsp;';
         } else {
             errorDisplayElement.innerText = 'No results';
+            checkIfOffline();
         }
     }
     // TODO: Clear out errorDisplayElement when switching tabs
@@ -285,3 +286,48 @@ function keepAlive() {
     }
 }
 setInterval(keepAlive, 2 * 60 * 1000);
+
+function checkIfOffline() {
+    console.log("Checking internet");
+
+    fetch('https://ccfp.geniusstrikes.com/internet_check.php', {
+        method: "GET"
+    }).then((response) => {
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        console.log("Online");
+        notifyOnline();
+    }).catch((error) => {
+        console.log("Offline");
+        console.error(error.message);
+        notifyOffline();
+    });
+}
+// Internet checking
+function notifyOffline() {
+    const offlineDiv = document.createElement('div');
+    offlineDiv.id = 'offline-notification';
+    offlineDiv.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 20px;
+        background: red;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 9999;
+    `;
+    offlineDiv.textContent = 'Internet Connection Lost';
+    document.body.appendChild(offlineDiv);
+}
+
+function notifyOnline() {
+    const offlineDiv = document.getElementById('offline-notification');
+    if (offlineDiv) {
+        offlineDiv.remove();
+    }
+}
+
+window.addEventListener('online', notifyOnline);
+window.addEventListener('offline', notifyOffline);
