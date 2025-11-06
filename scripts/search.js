@@ -14,7 +14,7 @@ function checkSearch() {
     //const INTENT_PHONE = 2;
     const barCodeStart = '9918';
 
-    errorDisplayElement.innerHTML = '&nbsp;';
+    errorDisplayElement.innerText = '';
 
     searchParent = document.getElementById('search-forms');
     if (!searchParent) {
@@ -73,7 +73,7 @@ function checkSearch() {
 
     const valSoFar = document.getElementById('intake_search_' + activeSearch.id).value;
     if (valSoFar == '') {
-        errorDisplayElement.innerHTML = '&nbsp;';
+        errorDisplayElement.innerText = '';
     }
 
     let intent = null;
@@ -186,16 +186,17 @@ var observer = new MutationObserver(function (event) {
         errorDisplayElement.innerText = 'Searching...';
     }
     if (state == SEARCHING && !e.classList.contains('ui-autocomplete-loading')) {
-        var found = false;
+        let numResults = null;
         for (searchResultDropdownElement of searchResultDropdownElements) {
             if (searchResultDropdownElement.style.display !== 'none') {
                 highlightPastUsers(searchResultDropdownElement);
-                found = true;
+                const clientLinks = searchResultDropdownElement.querySelectorAll('a.ui-menu-item-wrapper')
+                numResults = clientLinks.length;
                 break;
             }
         }
-        if (found) {
-            errorDisplayElement.innerHTML = '&nbsp;';
+        if (numResults !== null) {
+            errorDisplayElement.innerText = ((numResults < 10) ? numResults : 'Many') +  ' Results found';
         } else {
             errorDisplayElement.innerText = 'No results';
             checkIfOffline();
