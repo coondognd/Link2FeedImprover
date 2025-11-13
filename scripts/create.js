@@ -58,7 +58,7 @@ function checkIn() {
     console.log("Checking In...");
     //const todayYYYYMMDD = new Date().toISOString().split('T')[0];
 
-    const date = new Date(); 
+    const date = new Date();
 
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed, so add 1
@@ -98,6 +98,7 @@ function checkIn() {
         // Now we have a document to work with let's replace the <form>
         .then((doc) => {
             button.innerText = "Done!";
+            showBackToDashboardModal();
         })
         .catch((err) => {
             // Some form of connection failure
@@ -341,14 +342,16 @@ if (document.location.href.indexOf('/page/personal') > -1) {
     function afterDelay() {
 
         // First visit
-        if (document.getElementById('intake_personal_type_firstFoodBankVisit_selector').selectedIndex == 0) {
+        const firstVisitSelector = document.getElementById('intake_personal_type_firstFoodBankVisit_selector');
+        if (firstVisitSelector.selectedIndex == 0) {
 
-            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').options[3].selected = true;
+            if (firstVisitSelector.options.length > 3) {
+                firstVisitSelector.options[3].selected = true;
 
-            var evt = document.createEvent("HTMLEvents");
-            evt.initEvent('change', true, true);
-            document.getElementById('intake_personal_type_firstFoodBankVisit_selector').dispatchEvent(evt);
-
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent('change', true, true);
+                firstVisitSelector.dispatchEvent(evt);
+            }
         }
 
         let stoleFocus = false;
@@ -481,4 +484,89 @@ if (document.location.href.indexOf('/page/personal') > -1) {
 
     }
     window.setTimeout(afterDelay, 1000);
+}
+
+function showBackToDashboardModal() {
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'superfix-overlay';
+    Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: '99999'
+    });
+
+    // Create modal container
+    const modal = document.createElement('div');
+    Object.assign(modal.style, {
+        background: '#fff',
+        color: '#111',
+        padding: '24px',
+        borderRadius: '8px',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+        textAlign: 'center',
+        minWidth: '280px',
+        maxWidth: '90%'
+    });
+
+    // Title
+    const title = document.createElement('h2');
+    title.innerText = 'Done';
+    Object.assign(title.style, {
+        margin: '0 0 12px',
+        fontSize: '20px',
+        fontWeight: '600'
+    });
+
+    // Link back to dashboard
+    const link = document.createElement('a');
+    link.href = '/org/27075/dashboard';
+    link.innerText = 'Back to Dashboard';
+    Object.assign(link.style, {
+        display: 'inline-block',
+        marginTop: '12px',
+        padding: '8px 14px',
+        background: '#0078d4',
+        color: '#fff',
+        textDecoration: 'none',
+        borderRadius: '4px'
+    });
+    link.addEventListener('mouseover', () => link.style.background = '#005a9e');
+    link.addEventListener('mouseout', () => link.style.background = '#0078d4');
+
+    // Optional close on overlay click (but keep click on modal from closing)
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            removeOverlay();
+        }
+    });
+    function removeOverlay() {
+        if (overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+            document.body.style.overflow = '';
+            window.removeEventListener('keydown', onKeyDown);
+        }
+    }
+    function onKeyDown(e) {
+        if (e.key === 'Escape') removeOverlay();
+    }
+    window.addEventListener('keydown', onKeyDown);
+
+    // Assemble and show
+    modal.appendChild(title);
+    modal.appendChild(link);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
+
+    // Focus the link for accessibility
+    link.focus();
 }
