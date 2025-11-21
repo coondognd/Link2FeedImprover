@@ -123,7 +123,18 @@ async function openPdfAndPrint(pdfBlob) {
 }
 
 const enthnicityCoordinates = {
-    "hispanic_latino": { x: 222, y: 317 },
+    "aleut_or_eskimo":              { x: 30, y: 316 },
+    "american_indian":              { x: 30, y: 316 + (1 * 13) },
+    "asian":                        { x: 30, y: 316 + (2 * 13) },
+    "black_african_american":       { x: 30, y: 316 + (3 * 13) },
+    
+    "hispanic_latino":              { x: 223, y: 316 },
+    "middle_eastern_north_african": { x: 223, y: 316 + (1 * 13) },
+    "pacific_islander":             { x: 223, y: 316 + (2 * 13) },
+    "white":                        { x: 223, y: 316 + (3 * 13) },
+    
+    "biracial_multi_racial":        { x: 394, y: 316 },
+    "other":                        { x: 394, y: 316 + (1 * 13) }
 }
 const languageCoordinates = {
     "English": { x: 30, y: 264 },
@@ -142,6 +153,21 @@ async function runAddAndPrint() {
       alert("No text found on this page.");
       return;
     }*/
+    var barCode = null;
+
+    try {
+      const urlClientIdStartSpot = document.location.href.indexOf('/intake/') + '/intake/'.length
+      const urlClientIdEndSpot = document.location.href.indexOf('/page/personal');
+      const urlClientId = document.location.href.substring(urlClientIdStartSpot, urlClientIdEndSpot);
+      if (urlClientId) {
+        const formClientId = document.getElementById('intake_personal_type-identity-documents-container').querySelector('input[value="' + urlClientId + '"]').getAttribute('id').split('_').pop();
+        if (formClientId) {
+          barCode = document.getElementById('client_identity_document_identifier_' + formClientId).value;
+        }
+      }
+    } catch (err) {
+      console.warn("Could not read client ID from URL/form:", err);
+    }
     console.log("Reading form data...");
     var firstName = document.querySelector('input[name="intake_personal_type[firstName]"]').value;
     var lastName = document.querySelector('input[name="intake_personal_type[lastName]"]').value;
@@ -155,8 +181,7 @@ async function runAddAndPrint() {
 
     var dob = document.querySelector('input[name="intake_personal_type[dateOfBirth]-placeholder-date"]').value;
 
-    var phone = document.querySelector('input[name="client[phone][6836139][phone_number]"]').value;
-    var barCode = document.querySelector('input[name="client[identity][2500799][document_identifier]"]').value;
+    var phone = document.getElementById('client-contact-item-phone-container').querySelector('input[type="text"]').value;
     
     console.log("Read languages");
     // Read languages
@@ -197,14 +222,15 @@ async function runAddAndPrint() {
     // Start writing to PDF
     const pdfInserts = [
       { x: 30, y: 100, text: firstName  },
-      { x: 185, y: 100, text: lastName  },
-      { x: 319, y: 100, text: dob.replaceAll(/-/g, " ").split('').join(" ")  },
-      { x: 440, y: gender == "Male" ? 100 : 100 - 15, text: "X" },
-      { x: 110, y: 150, text: address1  },
+      { x: 179, y: 100, text: lastName  },
+      { x: 317, y: 100, text: dob.replaceAll(/-/g, " ").split('').join("  ")  },
+      { x: 440, y: gender == "Male" ? 97 : 100 - 17, text: "X" },
+      { x: 110, y: 153, text: address1  },
       { x: 110, y: 160, text: address2  },
-      { x: 110, y: 172, text: city  },
-      { x: 447, y: 160, text: zip  },
-      { x: 60, y: 195, text: phone.replaceAll(/[^\d]/g, ' ').split('').join("  ")  },
+      { x: 265, y: 160, text: city  },
+      { x: 447, y: 162, text: zip  },
+      //{ x: 60, y: 195, text: phone.replaceAll(/[^\d]/g, ' ').split('').join("  ")  },
+      { x: 70, y: 195, text: phone.replaceAll(/[^\d]/g, '').split('').join("   ")  },
       { x: 255, y: 676, text: barCode  },
       { x: 148, y: 676, text: "X" } // Renewal
     ]
@@ -234,10 +260,10 @@ async function runAddAndPrint() {
     const familyOffsetY = 441;
     for (var i = 0; i < family.length; i++) {
         const member = family[i];
-        pdfInserts.push({ x: 20, y: familyOffsetY + i * 44, text: member.name });
-        pdfInserts.push({ x: 410, y: familyOffsetY + i * 44, text: member.age });
-        pdfInserts.push({ x: 280, y: familyOffsetY + i * 44, text: member.dob });
-        pdfInserts.push({ x: 476, y: familyOffsetY + i * 44 + (member.gender == "Male" ? 8 : -5), text: "X" });
+        pdfInserts.push({ x: 10, y: familyOffsetY + i * 45, text: member.name });
+        pdfInserts.push({ x: 410, y: familyOffsetY + i * 45, text: member.age });
+        pdfInserts.push({ x: 270, y: familyOffsetY + i * 45, text: member.dob.split(' ').join("    ") });
+        pdfInserts.push({ x: 474, y: familyOffsetY + i * 45 + (member.gender == "Male" ? 8 : -7), text: "X" });
     }
 
     console.log("Loading PDF");
