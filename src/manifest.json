@@ -32,7 +32,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["pdfs/english.pdf"],
+        "resources": ["pdfs/english.pdf", "pdfs/spanish.pdf"],
         "matches": ["<all_urls>"]
       }
     ]

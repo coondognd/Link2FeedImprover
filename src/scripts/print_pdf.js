@@ -123,22 +123,22 @@ async function openPdfAndPrint(pdfBlob) {
 }
 
 const enthnicityCoordinates = {
-    "aleut_or_eskimo":              { x: 30, y: 316 },
-    "american_indian":              { x: 30, y: 316 + (1 * 13) },
-    "asian":                        { x: 30, y: 316 + (2 * 13) },
-    "black_african_american":       { x: 30, y: 316 + (3 * 13) },
-    
-    "hispanic_latino":              { x: 223, y: 316 },
-    "middle_eastern_north_african": { x: 223, y: 316 + (1 * 13) },
-    "pacific_islander":             { x: 223, y: 316 + (2 * 13) },
-    "white":                        { x: 223, y: 316 + (3 * 13) },
-    
-    "biracial_multi_racial":        { x: 394, y: 316 },
-    "other":                        { x: 394, y: 316 + (1 * 13) }
+  "aleut_or_eskimo": { x: 30, y: 316 },
+  "american_indian": { x: 30, y: 316 + (1 * 13) },
+  "asian": { x: 30, y: 316 + (2 * 13) },
+  "black_african_american": { x: 30, y: 316 + (3 * 13) },
+
+  "hispanic_latino": { x: 223, y: 316 },
+  "middle_eastern_north_african": { x: 223, y: 316 + (1 * 13) },
+  "pacific_islander": { x: 223, y: 316 + (2 * 13) },
+  "white": { x: 223, y: 316 + (3 * 13) },
+
+  "biracial_multi_racial": { x: 394, y: 316 },
+  "other": { x: 394, y: 316 + (1 * 13) }
 }
 const languageCoordinates = {
-    "English": { x: 30, y: 264 },
-    "Spanish": { x: 222, y: 264 },
+  "English": { x: 30, y: 264 },
+  "Spanish": { x: 222, y: 264 },
 }
 
 /**
@@ -147,12 +147,7 @@ const languageCoordinates = {
 async function runAddAndPrint() {
   console.log("Running PDF add-and-print...");
   try {
-    /*
-    const text = getPageText();
-    if (!text) {
-      alert("No text found on this page.");
-      return;
-    }*/
+
     var barCode = null;
 
     try {
@@ -168,11 +163,11 @@ async function runAddAndPrint() {
     } catch (err) {
       console.warn("Could not read client ID from URL/form:", err);
     }
-    console.log("Reading form data...");
+    //console.log("Reading form data...");
     var firstName = document.querySelector('input[name="intake_personal_type[firstName]"]').value;
     var lastName = document.querySelector('input[name="intake_personal_type[lastName]"]').value;
-    
-    var gender =  document.querySelector('select[name="intake_personal_type[genderType]"]').querySelector("option[selected]").innerText;
+
+    var gender = document.querySelector('select[name="intake_personal_type[genderType]"]').querySelector("option[selected]").innerText;
 
     var address1 = document.querySelector('input[name="intake_personal_type[household][address][addressLine1]"]').value;
     var address2 = document.querySelector('input[name="intake_personal_type[household][address][addressLine2]"]').value;
@@ -182,60 +177,69 @@ async function runAddAndPrint() {
     var dob = document.querySelector('input[name="intake_personal_type[dateOfBirth]-placeholder-date"]').value;
 
     var phone = document.getElementById('client-contact-item-phone-container').querySelector('input[type="text"]').value;
-    
-    console.log("Read languages");
+
+    //console.log("Read languages");
     // Read languages
     var languageElements = document.getElementById('s2id_intake_personal_type_languages').getElementsByClassName('select2-search-choice');
     const languages = [];
     for (var i = 0; i < languageElements.length; i++) {
-        languages.push(languageElements[i].innerText.trim())
+      languages.push(languageElements[i].innerText.trim())
     }
-    
-    console.log("Read family members");
+
+    const pdfLanguage = languages.includes('Spanish') ? 'Spanish' : 'English';
+
+    //console.log("Read family members");
     // Read family members
     const family = [];
     const familyTableRows = document.getElementById('household_members_table').getElementsByTagName('tr');
     for (var i = 1; i < familyTableRows.length; i++) {
-        const cells = familyTableRows[i].getElementsByTagName('td');
-        const familyName = cells[1].innerText.trim();
-        const familyGender = cells[3].innerText.trim();
-        const familyAge = cells[4].innerText.trim();
-        const familyDob = cells[5].innerText.trim();
-        family.push({
-            name: familyName,
-            gender: familyGender,
-            age: familyAge,
-            dob: familyDob
-        });
+      const cells = familyTableRows[i].getElementsByTagName('td');
+      const familyName = cells[1].innerText.trim();
+      const familyGender = cells[3].innerText.trim();
+      const familyAge = cells[4].innerText.trim();
+      const familyDob = cells[5].innerText.trim();
+      family.push({
+        name: familyName,
+        gender: familyGender,
+        age: familyAge,
+        dob: familyDob
+      });
     }
 
-    console.log("Read ethnicities");
+    //console.log("Read ethnicities");
     // Read ethnicities
     const ethnicities = [];
     const ethnicityElements = document.getElementsByName('intake_personal_type[ethnicities][]');
     for (var i = 0; i < ethnicityElements.length; i++) {
       if (ethnicityElements[i].checked) {
-          ethnicities.push(ethnicityElements[i].getAttribute('data-type-name'));
+        ethnicities.push(ethnicityElements[i].getAttribute('data-type-name'));
       }
     }
 
     // Start writing to PDF
     const pdfInserts = [
-      { x: 30, y: 100, text: firstName  },
-      { x: 179, y: 100, text: lastName  },
-      { x: 317, y: 100, text: dob.replaceAll(/-/g, " ").split('').join("  ")  },
-      { x: 440, y: gender == "Male" ? 97 : 100 - 17, text: "X" },
-      { x: 110, y: 153, text: address1  },
-      { x: 110, y: 160, text: address2  },
-      { x: 265, y: 160, text: city  },
-      { x: 447, y: 162, text: zip  },
+      { x: 30, y: 100, text: firstName },
+      { x: 179, y: 100, text: lastName },
+      { x: 317, y: 100, text: dob.replaceAll(/-/g, "").split('').join("  ") },
+      { x: 110, y: 153, text: address1 },
+      { x: 110, y: 160, text: address2 },
+      { x: 265, y: 160, text: city },
+      { x: 474, y: 162, text: zip },
       //{ x: 60, y: 195, text: phone.replaceAll(/[^\d]/g, ' ').split('').join("  ")  },
-      { x: 70, y: 195, text: phone.replaceAll(/[^\d]/g, '').split('').join("   ")  },
-      { x: 255, y: 676, text: barCode  },
-      { x: 148, y: 676, text: "X" } // Renewal
-    ]
+      { x: pdfLanguage == "Spanish" ? 88 : 70, y: 195, text: phone.replaceAll(/[^\d]/g, '').split('').join("   ") },
+      { x: 285, y: 676, text: barCode },
+      { x: pdfLanguage == "Spanish" ? 178 : 148, y: 676, text: "X" } // Renewal
+    ];
+    if (gender === "Female") {
+      pdfInserts.push({ x: 440, y: 83, text: "X" });
+    } else if (gender === "Male") {
+      pdfInserts.push({ x: 440, y: 97, text: "X" });
+    } else if (gender === "Non-binary") {
+      pdfInserts.push({ x: 440, y: 111, text: "X" });
+    }
 
-    console.log("Writing languages");
+
+    //console.log("Writing languages");
     // Write Languages
     for (var i = 0; i < languages.length; i++) {
       const language = languages[i];
@@ -245,7 +249,7 @@ async function runAddAndPrint() {
       }
     }
 
-    console.log("Writing ethnicities");
+    //console.log("Writing ethnicities");
     // Write Ethnicities
     for (var i = 0; i < ethnicities.length; i++) {
       const ethnicity = ethnicities[i];
@@ -255,20 +259,41 @@ async function runAddAndPrint() {
       }
     }
 
-    console.log("Writing family members");
+    //console.log("Writing family members");
     // Write Family members
     const familyOffsetY = 441;
     for (var i = 0; i < family.length; i++) {
-        const member = family[i];
-        pdfInserts.push({ x: 10, y: familyOffsetY + i * 45, text: member.name });
-        pdfInserts.push({ x: 410, y: familyOffsetY + i * 45, text: member.age });
-        pdfInserts.push({ x: 270, y: familyOffsetY + i * 45, text: member.dob.split(' ').join("    ") });
-        pdfInserts.push({ x: 474, y: familyOffsetY + i * 45 + (member.gender == "Male" ? 8 : -7), text: "X" });
+      const member = family[i];
+      var offset = familyOffsetY;
+      if (i > 4) {
+        offset += (6 * 45) + ((i - 5) * 13) - 10;  // Cram extra members at the bottom
+      } else {
+        offset += i * 45;// Normal spacing for first 5 members
+      }
+      pdfInserts.push({ x: 10, y: offset, text: member.name });
+      pdfInserts.push({ x: 410, y: offset, text: member.age });
+      pdfInserts.push({ x: 270, y: offset, text: member.dob.split(' ').join("    ") });
+
+      if (member.gender === "Female") {
+        pdfInserts.push({ x: 474, y: offset - 7, text: "X" });
+      } else if (member.gender === "Male") {
+        pdfInserts.push({ x: 474, y: offset + 8, text: "X" });
+      } else if (member.gender === "Non-binary") {
+        pdfInserts.push({ x: 474, y: offset + 23, text: "X" });
+      }
     }
 
-    console.log("Loading PDF");
+    //console.log("Loading PDF");
     // Load an existing PDF shipped with your extension. (sample.pdf must be in extension root and declared web_accessible_resources)
-    const arrayBuffer = await loadExtensionPdf("pdfs/english.pdf");
+    var pdfFile = "pdfs/english.pdf";
+    if (pdfLanguage === 'Spanish') {
+      pdfFile = "pdfs/spanish.pdf";
+      for (var i = 0; i < pdfInserts.length; i++) {
+        pdfInserts[i].y -= 3; // Spanish PDF needs slight Y offset
+      }
+    }
+
+    const arrayBuffer = await loadExtensionPdf(pdfFile);
     const pdfBlob = await addTextToPdf(arrayBuffer, pdfInserts);
     await openPdfAndPrint(pdfBlob);
   } catch (err) {
