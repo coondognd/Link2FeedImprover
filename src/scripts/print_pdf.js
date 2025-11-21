@@ -36,27 +36,29 @@ async function addTextToPdf(originalPdfArrayBuffer, entries, options = {}) {
   // You can embed fonts if needed. Use standard fonts or embed a TTF shipped with your extension.
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const pages = pdfDoc.getPages();
-  const firstPage = pages[0];
 
-  const { width, height } = firstPage.getSize();
-
-  // Example placement: top-left, with margin
   const marginx = 20;
   const marginy = 40;
   const fontSize = 12;
-  let y = height - marginy;
 
-  for (const entry of entries) {
-    firstPage.drawText(entry.text, {
-      x: marginx + entry.x,
-      y: y - entry.y,
-      size: fontSize,
-      font,
-      color: rgb(0, 0, 0),
-    });
-    //y -= fontSize + 4;
+  for (let i = 0; i < entries.length; i++) {
+    //const page = pages[i];
+
+    const { width, height } = pages[i].getSize();
+
+    let y = height - marginy;
+
+    for (const entry of entries[i]) {
+      pages[i].drawText(entry.text, {
+        x: marginx + entry.x,
+        y: y - entry.y,
+        size: fontSize,
+        font,
+        color: rgb(0, 0, 0),
+      });
+      //y -= fontSize + 4;
+    }
   }
-
   const newPdfBytes = await pdfDoc.save();
   return new Blob([newPdfBytes], { type: "application/pdf" });
 }
@@ -217,7 +219,7 @@ async function runAddAndPrint() {
     }
 
     // Start writing to PDF
-    const pdfInserts = [
+    const pdfPageOneInserts = [
       { x: 30, y: 100, text: firstName },
       { x: 179, y: 100, text: lastName },
       { x: 317, y: 100, text: dob.replaceAll(/-/g, "").split('').join("  ") },
@@ -231,11 +233,11 @@ async function runAddAndPrint() {
       { x: pdfLanguage == "Spanish" ? 178 : 148, y: 676, text: "X" } // Renewal
     ];
     if (gender === "Female") {
-      pdfInserts.push({ x: 440, y: 83, text: "X" });
+      pdfPageOneInserts.push({ x: 440, y: 83, text: "X" });
     } else if (gender === "Male") {
-      pdfInserts.push({ x: 440, y: 97, text: "X" });
+      pdfPageOneInserts.push({ x: 440, y: 97, text: "X" });
     } else if (gender === "Non-binary") {
-      pdfInserts.push({ x: 440, y: 111, text: "X" });
+      pdfPageOneInserts.push({ x: 440, y: 111, text: "X" });
     }
 
 
@@ -245,7 +247,7 @@ async function runAddAndPrint() {
       const language = languages[i];
       if (languageCoordinates[language]) {
         const coords = languageCoordinates[language];
-        pdfInserts.push({ x: coords.x, y: coords.y, text: "X" });
+        pdfPageOneInserts.push({ x: coords.x, y: coords.y, text: "X" });
       }
     }
 
@@ -255,7 +257,7 @@ async function runAddAndPrint() {
       const ethnicity = ethnicities[i];
       if (enthnicityCoordinates[ethnicity]) {
         const coords = enthnicityCoordinates[ethnicity];
-        pdfInserts.push({ x: coords.x, y: coords.y, text: "X" });
+        pdfPageOneInserts.push({ x: coords.x, y: coords.y, text: "X" });
       }
     }
 
@@ -270,31 +272,42 @@ async function runAddAndPrint() {
       } else {
         offset += i * 45;// Normal spacing for first 5 members
       }
-      pdfInserts.push({ x: 10, y: offset, text: member.name });
-      pdfInserts.push({ x: 410, y: offset, text: member.age });
-      pdfInserts.push({ x: 270, y: offset, text: member.dob.split(' ').join("    ") });
+      pdfPageOneInserts.push({ x: 10, y: offset, text: member.name });
+      pdfPageOneInserts.push({ x: 410, y: offset, text: member.age });
+      pdfPageOneInserts.push({ x: 270, y: offset, text: member.dob.split(' ').join("    ") });
 
       if (member.gender === "Female") {
-        pdfInserts.push({ x: 474, y: offset - 7, text: "X" });
+        pdfPageOneInserts.push({ x: 474, y: offset - 7, text: "X" });
       } else if (member.gender === "Male") {
-        pdfInserts.push({ x: 474, y: offset + 8, text: "X" });
+        pdfPageOneInserts.push({ x: 474, y: offset + 8, text: "X" });
       } else if (member.gender === "Non-binary") {
-        pdfInserts.push({ x: 474, y: offset + 23, text: "X" });
+        pdfPageOneInserts.push({ x: 474, y: offset + 23, text: "X" });
       }
     }
 
     //console.log("Loading PDF");
     // Load an existing PDF shipped with your extension. (sample.pdf must be in extension root and declared web_accessible_resources)
+
+
+    const pdfPageTwoInserts = [
+      { x: 130, y: 80, text: `${firstName} ${lastName}` },
+      { x: 130, y: 100, text: zip },
+      { x: 440, y: 100, text: family.length + 1 + "" }
+    ];
+
     var pdfFile = "pdfs/english.pdf";
     if (pdfLanguage === 'Spanish') {
       pdfFile = "pdfs/spanish.pdf";
-      for (var i = 0; i < pdfInserts.length; i++) {
-        pdfInserts[i].y -= 3; // Spanish PDF needs slight Y offset
+      for (var i = 0; i < pdfPageOneInserts.length; i++) {
+        pdfPageOneInserts[i].y -= 3; // Spanish PDF needs slight Y offset
+      }
+      for (var i = 0; i < pdfPageTwoInserts.length; i++) {
+        pdfPageTwoInserts[i].y -= 17; // Spanish PDF needs slight Y offset
       }
     }
 
     const arrayBuffer = await loadExtensionPdf(pdfFile);
-    const pdfBlob = await addTextToPdf(arrayBuffer, pdfInserts);
+    const pdfBlob = await addTextToPdf(arrayBuffer, [pdfPageOneInserts, pdfPageTwoInserts]);
     await openPdfAndPrint(pdfBlob);
   } catch (err) {
     console.error("PDF edit/print failed:", err);
