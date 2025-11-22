@@ -276,25 +276,30 @@ if (document.location.href.indexOf('/page/personal') > -1) {
 
     // Alerts 
     let alerts = document.querySelectorAll(".alert .pull-left");
-    let tefapRequired = false;
+    let tefapAlertAlreadyShown = false;
     for (const alert of alerts) {
-        if (alert.innerText === "Recertification Required") {
-            alert.innerText = "TEFAP Recertification Required. Give client TEFAP form";
-            tefapRequired = true;
-        } else if (alert.innerText === "Profile Review Required") {
+        if (tefapAlertAlreadyShown) {
             let alertParent = alert.closest(".alert");
-            if (tefapRequired) {
-                alertParent.remove(); // No need for multiple alerts
-            } else {
-                alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";
-                alertHTML += "<button  id='updateAndCheckIn'>Kevin's SuperFix Button</button>";
+            alertParent.remove(); // No need for multiple alerts
+            continue;
+        }
+        if (alert.innerText === "Recertification Required") {
+            alertHTML = "TEFAP Recertification Required. Give client TEFAP form ";
+            alertHTML += "<button  id='printTEFAP'>Print TEFAP</button>";
+            alert.innerHTML = alertHTML;
+
+            printTEFAPButton = document.getElementById("printTEFAP");
+            printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
+            tefapAlertAlreadyShown = true;
+        } else if (alert.innerText === "Profile Review Required") {
+            alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";
+            alertHTML += "<button  id='updateAndCheckIn'>Kevin's SuperFix Button</button>";
 
 
-                alert.innerHTML = alertHTML;
+            alert.innerHTML = alertHTML;
 
-                superFixButton = document.getElementById("updateAndCheckIn");
-                superFixButton.addEventListener("click", updateAndCheckIn);
-            }
+            superFixButton = document.getElementById("updateAndCheckIn");
+            superFixButton.addEventListener("click", updateAndCheckIn);
         }
     }
 

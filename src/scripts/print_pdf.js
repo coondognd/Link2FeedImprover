@@ -1,6 +1,7 @@
 // content-script.js
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
+
 /**
  * Read text from page: use either the user selection, or fallback to reading
  * some element text (you may tailor this to your needs).
@@ -319,7 +320,6 @@ async function runAddAndPrint() {
  * Optionally expose a keyboard shortcut, or react to messages
  * For example, run when user clicks the extension action: receive message from background.
  */
-/*
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === "ADD_AND_PRINT") {
     runAddAndPrint();
@@ -327,9 +327,32 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
 });
-*/
 
 // For quick testing via console
 window.__pdfAddPrint = runAddAndPrint;
-console.log("PDF add-and-print script loaded. Call __pdfAddPrint() to run.");
-setTimeout(() => { runAddAndPrint(); }, 1000);
+//console.log("PDF add-and-print script loaded. Call __pdfAddPrint() to run.");
+//setTimeout(() => { runAddAndPrint(); }, 1000);
+
+// ---- BRIDGE SETUP (add this once in your content script) ----
+
+// Inject a small script into the *page world*
+function exposePdfAddPrintToPage() {
+  const script = document.createElement('script');
+  script.textContent = `
+    // Create global function in page's JS environment
+    window.pdfAddPrint = function() {
+      document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT"));
+    };
+  `;
+  document.documentElement.appendChild(script);
+  script.remove();
+}
+
+// Listen for the "run the function" event, from page world
+document.addEventListener("EXT_PDF_ADD_PRINT", () => {
+  // Call your content-script function
+  runAddAndPrint();
+});
+
+// Actually inject the function
+exposePdfAddPrintToPage();
