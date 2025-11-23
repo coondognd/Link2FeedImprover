@@ -60,6 +60,12 @@ async function addTextToPdf(originalPdfArrayBuffer, entries, options = {}) {
       //y -= fontSize + 4;
     }
   }
+ /* 
+pdfDoc.addJavaScript(
+  'main',
+  'this.print();'
+);
+*/
   const newPdfBytes = await pdfDoc.save();
   return new Blob([newPdfBytes], { type: "application/pdf" });
 }
@@ -86,6 +92,7 @@ function splitTextIntoLines(text, maxChars) {
  * Open blob in a new tab and call print. We create an object URL and open it.
  * When the new tab loads, inject a small script to call window.print() automatically.
  */
+/*
 async function openPdfAndPrint(pdfBlob) {
   const objectUrl = URL.createObjectURL(pdfBlob);
 
@@ -124,6 +131,43 @@ async function openPdfAndPrint(pdfBlob) {
     popup.document.close();
   }
 }
+*/
+
+/*
+function openPdfAndPrint(pdfBlob) {
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  chrome.tabs.create({ url: pdfUrl }, tab => {
+    // The PDF viewer auto-runs print(); after load if `#print` is appended
+    chrome.tabs.update(tab.id, { url: pdfUrl + "#print" });
+  });
+}
+*/
+
+/*
+function openPdfAndPrint(pdfBlob) {
+// content.js
+  const reader = new FileReader();
+  reader.onload = () => {
+    chrome.runtime.sendMessage({
+      action: "printPdf",
+      pdfDataUrl: reader.result,
+    });
+  };
+  reader.readAsDataURL(pdfBlob);
+
+}
+*/
+
+
+function openPdfAndPrint(pdfBlob) {
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+    chrome.runtime.sendMessage({
+      action: "printPdf",
+      pdfDataUrl: pdfUrl,
+    });
+
+}
+
 
 const enthnicityCoordinates = {
   "aleut_or_eskimo": { x: 30, y: 316 },
@@ -223,13 +267,14 @@ async function runAddAndPrint() {
     const pdfPageOneInserts = [
       { x: 30, y: 100, text: firstName },
       { x: 179, y: 100, text: lastName },
-      { x: 317, y: 100, text: dob.replaceAll(/-/g, "").split('').join("  ") },
-      { x: 110, y: 153, text: address1 },
-      { x: 110, y: 160, text: address2 },
-      { x: 265, y: 160, text: city },
+      //{ x: 317, y: 100, text: dob.replaceAll(/-/g, "").split('').join("  ") },
+      { x: 323, y: 100, text: dob.split('-').join("   ") },
+      { x: 110, y: address2 ? 155 : 162, text: address1 }, // Move address1 up if there's an address2
+      { x: 110, y: 167, text: address2 },
+      { x: 265, y: 162, text: city },
       { x: 474, y: 162, text: zip },
-      //{ x: 60, y: 195, text: phone.replaceAll(/[^\d]/g, ' ').split('').join("  ")  },
-      { x: pdfLanguage == "Spanish" ? 88 : 70, y: 195, text: phone.replaceAll(/[^\d]/g, '').split('').join("   ") },
+      //{ x: pdfLanguage == "Spanish" ? 88 : 70, y: 195, text: phone.replaceAll(/[^\d]/g, '').split('').join("   ") },
+      { x: pdfLanguage == "Spanish" ? 73 : 55, y: 195, text: phone.replaceAll(/[\(\)]/g, '-').split('-').join("        ") },
       { x: 285, y: 676, text: barCode },
       { x: pdfLanguage == "Spanish" ? 178 : 148, y: 676, text: "X" } // Renewal
     ];
@@ -336,6 +381,7 @@ window.__pdfAddPrint = runAddAndPrint;
 // ---- BRIDGE SETUP (add this once in your content script) ----
 
 // Inject a small script into the *page world*
+/*
 function exposePdfAddPrintToPage() {
   const script = document.createElement('script');
   script.textContent = `
@@ -347,6 +393,7 @@ function exposePdfAddPrintToPage() {
   document.documentElement.appendChild(script);
   script.remove();
 }
+*/
 
 // Listen for the "run the function" event, from page world
 document.addEventListener("EXT_PDF_ADD_PRINT", () => {
@@ -355,4 +402,4 @@ document.addEventListener("EXT_PDF_ADD_PRINT", () => {
 });
 
 // Actually inject the function
-exposePdfAddPrintToPage();
+//exposePdfAddPrintToPage();

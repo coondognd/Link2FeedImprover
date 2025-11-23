@@ -275,28 +275,34 @@ if (document.location.href.indexOf('/page/personal') > -1) {
 
 
     // Alerts 
-    let alerts = document.querySelectorAll(".alert .pull-left");
+    let alerts = document.querySelectorAll(".alert");// .pull-left");
     let tefapAlertAlreadyShown = false;
     for (const alert of alerts) {
         if (tefapAlertAlreadyShown) {
-            let alertParent = alert.closest(".alert");
-            alertParent.remove(); // No need for multiple alerts
+            //let alertParent = alert.closest(".alert");
+            //alertParent.remove(); // No need for multiple alerts
+            alert.remove();   // No need for multiple alerts
             continue;
         }
-        if (alert.innerText === "Recertification Required") {
+        const alertContents = alert.querySelectorAll("strong.pull-left");
+        if (alertContents.length == 0) {
+            continue;
+        }
+        alertContent = alertContents[0];
+        if (alertContent.innerText === "Recertification Required") {
             alertHTML = "TEFAP Recertification Required. Give client TEFAP form ";
             alertHTML += "<button  id='printTEFAP'>Print TEFAP</button>";
-            alert.innerHTML = alertHTML;
+            alertContent.innerHTML = alertHTML;
 
             printTEFAPButton = document.getElementById("printTEFAP");
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
             tefapAlertAlreadyShown = true;
-        } else if (alert.innerText === "Profile Review Required") {
+        } else if (alertContent.innerText === "Profile Review Required") {
             alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";
             alertHTML += "<button  id='updateAndCheckIn'>Kevin's SuperFix Button</button>";
 
 
-            alert.innerHTML = alertHTML;
+            alertContent.innerHTML = alertHTML;
 
             superFixButton = document.getElementById("updateAndCheckIn");
             superFixButton.addEventListener("click", updateAndCheckIn);

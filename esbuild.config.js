@@ -33,7 +33,7 @@ function copyStatic() {
 const buildOptions = {
   entryPoints: {
     //background: `${SRC}/background.js`,
-    content: `${SRC}/scripts/print_pdf.js`
+    "print_pdf.bundle": `${SRC}/scripts/print_pdf.js`
   },
   outdir: `${DIST}/scripts`,
   bundle: true,
