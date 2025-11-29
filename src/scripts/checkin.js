@@ -147,7 +147,7 @@ const visitRecordingTargetNode = document.getElementById("modal-visit-recording"
 // Options for the observer (which mutations to observe)
 const visitRecordingConfig = { attributes: true, childList: false, subtree: false };
 
-var modalAlreadyOpen = false;
+var visitRecordingModalAlreadyOpen = false;
 // Callback function to execute when mutations are observed
 const visitRecordingCallback = (mutationList, observer) => {
     for (const mutation of mutationList) {
@@ -156,8 +156,8 @@ const visitRecordingCallback = (mutationList, observer) => {
             if (visitRecordingTargetNode.style.display !== "none") {
                 //console.log("Opened post-checkin modal");
                 const nameElements = document.querySelectorAll("#modal-visit-recording .client-name")
-                if (nameElements && nameElements.length && !modalAlreadyOpen) {
-                    modalAlreadyOpen = true;
+                if (nameElements && nameElements.length && !visitRecordingModalAlreadyOpen) {
+                    visitRecordingModalAlreadyOpen = true;
                     const nameElement = nameElements[0];
                     const labelAndName = nameElement.innerText.split(":");
                     if (labelAndName.length > 0) {
@@ -168,7 +168,7 @@ const visitRecordingCallback = (mutationList, observer) => {
                 }
 
             } else {
-                modalAlreadyOpen = false;
+                visitRecordingModalAlreadyOpen = false;
             }
         }
     }
