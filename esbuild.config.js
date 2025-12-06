@@ -13,7 +13,10 @@ const STATIC_FILES = [
   "pdf.worker.js",
   "images",
   "pdfs",
-  "scripts"
+  "scripts/background.js",
+  "scripts/checkin.js",
+  "scripts/create.js",
+  "scripts/search.js",
 ];
 
 // ===== STATIC FILE COPYING =====

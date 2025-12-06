@@ -164,60 +164,19 @@ function highlightPastUsers(resultsElement) {
                 clientLink.style.backgroundColor = '#ccffcc';
                 clientLink.style.color = '#000000';
             }
-            clientLink.addEventListener("click", () => { handleClickOfSearchResult(clientId); })
+            //clientLink.addEventListener("click", () => { handleClickOfSearchResult(clientId); })
         }
     });
 }
 
-const esignatureModal = document.getElementById('qc_esignature_Form');//('esignature-modal');
-const duplicateCheckinDiv = document.createElement("div");
-duplicateCheckinDiv.id = 'duplicateCheckinDiv'
-esignatureModal.appendChild(duplicateCheckinDiv);
-//const errorDisplayElement = document.getElementById('searchResultsDisplay');
 
-function handleClickOfSearchResult(clientId) {
-
-    // Make call to get latest visit
-
-    let visitedToday = null;
-    duplicateCheckinDiv.innerText = 'Checking last visit...';
-    // Fetch last visit and check if visited today
-    fetch(`https://portal.link2feed.com/org/27075/intake/${clientId}/embed-last-visit?highlight=1`)
-        .then(response => response.text())
-        .then(html => {
-            // Parse response to see if checked in today
-            if (html.includes('today')) {
-                visitedToday = true;
-            } else {
-                visitedToday = false;
-            }
-        })
-        .catch(error => console.error('Error fetching last visit:', error))
-        .finally(() => {
-            //displayVisitedToday(visitedToday);
-            if (visitedToday) {
-                duplicateCheckinDiv.innerHTML = "<span style='color:#ff0000;font-weight:bold;'>Warning: This client has already checked in today!</span>";
-            } else {
-                duplicateCheckinDiv.innerHTML = '';
-            }
-        });
-
-}
+// When a search result in the dropdown is clicked.
+// TODO: Find a way to do this for the case where the dropdown is skipped entirely (only one result)
 /*
-function displayVisitedToday(visitedToday, attempts = 0) {
-    const modal = document.getElementById('esignature-modal');
-    if (modal && modal.style.display !== 'none') {
-
-        // insertBefore 'qc_esignature_Form'
-        console.log('visible');
-        return;
-    }
-    if (attempts < 3) {
-        setTimeout(() => displayVisitedToday(visitedToday, attempts + 1), 1000);
-    }
+function handleClickOfSearchResult(clientId) {
+    checkIn(clientId);
 }
 */
-
 
 /*
  *  Let the user know if the search is still going or not

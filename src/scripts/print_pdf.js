@@ -3,19 +3,6 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 
 /**
- * Read text from page: use either the user selection, or fallback to reading
- * some element text (you may tailor this to your needs).
- */
-/*
-function getPageText() {
-  const sel = window.getSelection();
-  if (sel && sel.toString().trim()) return sel.toString().trim();
-
-  // fallback: grab body text (or restrict to some element)
-  return document.body.innerText.slice(0, 2000); // don't grab too much
-}
-*/
-/**
  * Load PDF (from extension file). Because content scripts run in page context,
  * fetch the web-accessible resource using runtime.getURL.
  */
@@ -60,104 +47,10 @@ async function addTextToPdf(originalPdfArrayBuffer, entries, options = {}) {
       //y -= fontSize + 4;
     }
   }
- /* 
-pdfDoc.addJavaScript(
-  'main',
-  'this.print();'
-);
-*/
+
   const newPdfBytes = await pdfDoc.save();
   return new Blob([newPdfBytes], { type: "application/pdf" });
 }
-
-/*
-function splitTextIntoLines(text, maxChars) {
-  const words = text.split(/\s+/);
-  const lines = [];
-  let cur = "";
-  for (const w of words) {
-    if ((cur + " " + w).trim().length > maxChars) {
-      lines.push(cur.trim());
-      cur = w;
-    } else {
-      cur = (cur + " " + w).trim();
-    }
-  }
-  if (cur) lines.push(cur.trim());
-  return lines;
-}
-*/
-
-/**
- * Open blob in a new tab and call print. We create an object URL and open it.
- * When the new tab loads, inject a small script to call window.print() automatically.
- */
-/*
-async function openPdfAndPrint(pdfBlob) {
-  const objectUrl = URL.createObjectURL(pdfBlob);
-
-  // Open a new window/tab with a small HTML wrapper that embeds the PDF and prints.
-  const html = `
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Print PDF</title>
-        <style>html,body{height:100%;margin:0}</style>
-      </head>
-      <body>
-        <embed src="${objectUrl}" type="application/pdf" width="100%" height="100%"></embed>
-        <script>
-          // Give browser a moment to render the PDF then call print.
-          window.addEventListener('load', () => {
-            setTimeout(() => {
-              window.print();
-              // close after printing (user may cancel, so we wait a bit)
-              setTimeout(() => { window.close(); }, 500);
-            }, 500);
-          });
-        </script>
-      </body>
-    </html>
-  `;
-  const popup = window.open();
-  if (!popup) {
-    // popup blocked; fallback: open in same tab
-    const w = window.open("about:blank");
-    w.document.write(html);
-    w.document.close();
-  } else {
-    popup.document.write(html);
-    popup.document.close();
-  }
-}
-*/
-
-/*
-function openPdfAndPrint(pdfBlob) {
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  chrome.tabs.create({ url: pdfUrl }, tab => {
-    // The PDF viewer auto-runs print(); after load if `#print` is appended
-    chrome.tabs.update(tab.id, { url: pdfUrl + "#print" });
-  });
-}
-*/
-
-/*
-function openPdfAndPrint(pdfBlob) {
-// content.js
-  const reader = new FileReader();
-  reader.onload = () => {
-    chrome.runtime.sendMessage({
-      action: "printPdf",
-      pdfDataUrl: reader.result,
-    });
-  };
-  reader.readAsDataURL(pdfBlob);
-
-}
-*/
-
 
 function openPdfAndPrint(pdfBlob) {
   const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -375,31 +268,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 // For quick testing via console
 window.__pdfAddPrint = runAddAndPrint;
-//console.log("PDF add-and-print script loaded. Call __pdfAddPrint() to run.");
-//setTimeout(() => { runAddAndPrint(); }, 1000);
-
-// ---- BRIDGE SETUP (add this once in your content script) ----
-
-// Inject a small script into the *page world*
-/*
-function exposePdfAddPrintToPage() {
-  const script = document.createElement('script');
-  script.textContent = `
-    // Create global function in page's JS environment
-    window.pdfAddPrint = function() {
-      document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT"));
-    };
-  `;
-  document.documentElement.appendChild(script);
-  script.remove();
-}
-*/
 
 // Listen for the "run the function" event, from page world
 document.addEventListener("EXT_PDF_ADD_PRINT", () => {
   // Call your content-script function
   runAddAndPrint();
 });
-
-// Actually inject the function
-//exposePdfAddPrintToPage();

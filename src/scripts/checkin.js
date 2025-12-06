@@ -100,6 +100,86 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
         }
     }
 }
+
+
+/*
+*  Duplicate check-in warning in e-signature modal
+*/
+
+/*
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log("Received message in background:", msg);
+  if (msg && msg.type === "CHECKIN") {
+    checkIn(msg.clientId);
+    sendResponse({ ok: true });
+  }
+  return true;
+});
+*/
+
+const checkDuplicateCheckIn = () => {
+    const clientId = document.body.getAttribute("data-client-id");
+    
+    // Make call to get latest visit
+
+    let visitedToday = null;
+    // Fetch last visit and check if visited today
+    fetch(`https://portal.link2feed.com/org/27075/intake/${clientId}/embed-last-visit?highlight=1`)
+        .then(response => response.text())
+        .then(html => {
+            // Parse response to see if checked in today
+            if (html.includes('today')) {
+                visitedToday = true;
+            } else {
+                visitedToday = false;
+            }
+        })
+        .catch(error => console.error('Error fetching last visit:', error))
+        .finally(() => {
+            //displayVisitedToday(visitedToday);
+            if (visitedToday) {
+                duplicateCheckinDiv.innerHTML = "<span style='color:#ff0000;font-weight:bold;'>Warning: This client has already checked in today!</span>";
+            } else {
+                duplicateCheckinDiv.innerHTML = '';
+            }
+            document.body.setAttribute("data-client-id", '');
+        });
+}
+
+const esignatureModalForm = document.getElementById('qc_esignature_Form');
+const duplicateCheckinDiv = document.createElement("div");
+duplicateCheckinDiv.id = 'duplicateCheckinDiv'
+esignatureModalForm.appendChild(duplicateCheckinDiv);
+
+// Start observing the esignature modal for open/close
+// When it opens, clear out duplicate check-in warning
+const esignatureModal = document.getElementById('esignature-modal');
+var esignatureModalAlreadyOpen = false;
+// Callback function to execute when mutations are observed
+const esignatureCallback = (mutationList, observer) => {
+    for (const mutation of mutationList) {
+        if (mutation.type === "attributes") {
+            
+            if (esignatureModal.style.display !== "none") {
+                if (!esignatureModalAlreadyOpen) {
+                    esignatureModalAlreadyOpen = true;
+                    duplicateCheckinDiv.innerText = '';
+                    checkDuplicateCheckIn();
+                }
+
+            } else {
+                esignatureModalAlreadyOpen = false;
+            }
+        }
+    }
+};
+// Create an observer instance linked to the callback function
+const esignatureObserver = new MutationObserver(esignatureCallback);
+// Options for the observer (which mutations to observe)
+const esignatureConfig = { attributes: true, childList: false, subtree: false };
+esignatureObserver.observe(esignatureModal, esignatureConfig);
+
+
 /*
  * Esignature modal
  */
@@ -178,3 +258,4 @@ const visitRecordingCallback = (mutationList, observer) => {
 const visitRecordingObserver = new MutationObserver(visitRecordingCallback);
 // Start observing the target node for configured mutations
 visitRecordingObserver.observe(visitRecordingTargetNode, visitRecordingConfig);
+
