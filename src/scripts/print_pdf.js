@@ -6,7 +6,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
  * Load PDF (from extension file). Because content scripts run in page context,
  * fetch the web-accessible resource using runtime.getURL.
  */
-async function loadExtensionPdf(path = "pdfs/english.pdf") {
+async function loadExtensionPdf(path = "english.pdf") {
   const url = chrome.runtime.getURL(path);
   const resp = await fetch(url);
   if (!resp.ok) throw new Error("Could not fetch PDF: " + resp.status);
@@ -224,7 +224,7 @@ async function runAddAndPrint() {
       }
     }
 
-    //console.log("Loading PDF");
+    console.log("Loading PDF");
     // Load an existing PDF shipped with your extension. (sample.pdf must be in extension root and declared web_accessible_resources)
 
 
@@ -234,9 +234,9 @@ async function runAddAndPrint() {
       { x: 440, y: 100, text: family.length + 1 + "" }
     ];
 
-    var pdfFile = "pdfs/english.pdf";
+    var pdfFile = "english.pdf";
     if (pdfLanguage === 'Spanish') {
-      pdfFile = "pdfs/spanish.pdf";
+      pdfFile = "spanish.pdf";
       for (var i = 0; i < pdfPageOneInserts.length; i++) {
         pdfPageOneInserts[i].y -= 3; // Spanish PDF needs slight Y offset
       }
@@ -247,6 +247,7 @@ async function runAddAndPrint() {
 
     const arrayBuffer = await loadExtensionPdf(pdfFile);
     const pdfBlob = await addTextToPdf(arrayBuffer, [pdfPageOneInserts, pdfPageTwoInserts]);
+    console.log("PDF edit complete, opening print dialog...");
     await openPdfAndPrint(pdfBlob);
   } catch (err) {
     console.error("PDF edit/print failed:", err);

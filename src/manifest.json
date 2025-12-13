@@ -49,8 +49,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "pdfs/english.pdf",
-        "pdfs/spanish.pdf"
+        "english.pdf",
+        "spanish.pdf"
       ],
       "matches": [
         "<all_urls>"
