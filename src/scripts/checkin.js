@@ -8,6 +8,7 @@ const referenceElement = document.querySelector('.page-header');
 if (referenceElement && elementToMove) {
     referenceElement.parentNode.insertBefore(elementToMove, referenceElement.nextSibling);
 }
+const expiringClients = new Set();
 
 /*
  * Hide Quick Click, to prevent accidental change
@@ -58,8 +59,20 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
         //console.log("Found most recent client. Looking for household size");
         // Example usage:
         clientIdElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(1) > a");
-        if (clientIdElement) {
-            recordCheckin(clientIdElement.innerText.trim(), new Date().toISOString().split('T')[0]);
+        const clientId = clientIdElement ? clientIdElement.innerText.trim() : null;
+        var insertSpot = document.querySelector("#modal-visit-recording > div > div > div.modal-body > div.ph-item.quick-click.no-animation.quick-click-confirmation.program-content-11104")
+        var newDiv = document.createElement('div');
+        if (clientId) {
+            recordCheckin(clientId, new Date().toISOString().split('T')[0]);
+            if (expiringClients && expiringClients.has(clientId)) {
+                let expiringSoonDiv = document.getElementById('expiringSoonDiv');
+                if (!expiringSoonDiv) {
+                    expiringSoonDiv = document.createElement('div');
+                    expiringSoonDiv.id = 'expiringSoonDiv'
+                    newDiv.appendChild(expiringSoonDiv);
+                }
+                expiringSoonDiv.innerHTML = 'Renewal due soon!<br/><a href="/org/27075/intake/' + clientId + '/page/personal?search=true" style="color:#ff0000;font-weight:bold;">Go to client page</a>';
+            }
         }
         mostRecentHouseHoldElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(3)");
         //console.log(mostRecentHouseHoldElement)
@@ -77,8 +90,7 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
                 if (!largeFamilyDiv) {
                     largeFamilyDiv = document.createElement('div');
                     largeFamilyDiv.id = 'largeFamilyDiv'
-                    insertSpot = document.querySelector("#modal-visit-recording > div > div > div.modal-body > div.ph-item.quick-click.no-animation.quick-click-confirmation.program-content-11104")
-                    insertSpot.appendChild(largeFamilyDiv);
+                    newDiv.appendChild(largeFamilyDiv);
                 }
                 if (houseHoldSize >= 5) {
                     largeFamilyDiv.style.fontWeight = 'bold';
@@ -89,6 +101,7 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
                 //}
             }
         }
+        insertSpot.appendChild(newDiv);
     } else {
         //console.log("Couldn't find the family size.")
         if (attemptNumber <= 3) {
@@ -258,4 +271,51 @@ const visitRecordingCallback = (mutationList, observer) => {
 const visitRecordingObserver = new MutationObserver(visitRecordingCallback);
 // Start observing the target node for configured mutations
 visitRecordingObserver.observe(visitRecordingTargetNode, visitRecordingConfig);
+
+
+
+
+
+// Get clients who are due for renewal soon
+
+const EXPIRING_CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/expiring_clients.php";
+
+async function fetchExpiringClients() {
+    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+
+
+    try {
+        const response = await fetch(EXPIRING_CLIENTS_API_URL, {
+            method: "GET",
+            headers: {
+                "Authorization": authHeader,
+                "Content-Type": "application/json"
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const clients = await response.json();
+        return clients;
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+
+const expiringClientsString = sessionStorage.getItem("expiringClients");
+let expiringClientsArray = [];
+if (expiringClientsString) {
+    expiringClientsArray = JSON.parse(expiringClientsString);
+} else {
+    fetchExpiringClients().then((clients) => {
+        if (clients) {
+            sessionStorage.setItem("expiringClients", JSON.stringify(clients))
+        }
+    }).catch(() => { })
+}
+expiringClientsArray.forEach((expiringClientID) => {
+    expiringClients.add(expiringClientID, 1);
+})
 

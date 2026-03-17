@@ -285,7 +285,6 @@ previousClientsArray.forEach((previousClientID) => {
     previousClients.add(previousClientID, 1);
 })
 
-
 // If we stay on the page too long, the cookie expires.
 // So call a URL that updates the cookie every so often
 function keepAlive() {

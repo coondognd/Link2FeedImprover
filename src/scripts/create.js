@@ -289,12 +289,17 @@ if (document.location.href.indexOf('/page/personal') > -1) {
             continue;
         }
         alertContent = alertContents[0];
-        if (alertContent.innerText === "Recertification Required") {
+        if (alertContent.innerText.indexOf("TEFAP Recertification Date") == 0) {
+            alertContent.innerHTML +=  " <button  id='printTEFAP_anytime'>Print TEFAP</button>";
+
+            var printTEFAPButton = document.getElementById("printTEFAP_anytime");
+            printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
+        } else if (alertContent.innerText === "Recertification Required") {
             alertHTML = "TEFAP Recertification Required. Give client TEFAP form ";
             alertHTML += "<button  id='printTEFAP'>Print TEFAP</button>";
             alertContent.innerHTML = alertHTML;
 
-            printTEFAPButton = document.getElementById("printTEFAP");
+            var printTEFAPButton = document.getElementById("printTEFAP");
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
             tefapAlertAlreadyShown = true;
         } else if (alertContent.innerText === "Profile Review Required") {
