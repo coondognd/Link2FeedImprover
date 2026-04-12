@@ -31,7 +31,7 @@ function observeElement(element, property, callback, delay = 0) {
 const API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
 
 function recordCheckin(clientId, sessionDate) {
-    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+    const authHeader = "Bearer Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
 
     fetch(API_URL, {
         method: "POST",

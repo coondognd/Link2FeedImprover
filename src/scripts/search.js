@@ -244,10 +244,10 @@ for (clientSearchElement of clientSearchElements) {
 
 // Get clients who have visited in the past
 
-const CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/clients.php";
+const CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/api/clients.php";
 
 async function fetchClients() {
-    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+    const authHeader = "Bearer Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
 
 
     try {

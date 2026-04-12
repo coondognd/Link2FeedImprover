@@ -16,10 +16,10 @@ const expiringClients = new Set();
 document.getElementById("quick-click-panel").style.display = 'none';
 
 
-const CHECKIN_API_URL = "https://ccfp.geniusstrikes.com/checkin.php";
+const CHECKIN_API_URL = "https://ccfp.geniusstrikes.com/api/checkin.php";
 
 function recordCheckin(clientId, sessionDate) {
-    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+    const authHeader = "Bearer Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
     
     fetch(CHECKIN_API_URL, {
         method: "POST",
@@ -45,12 +45,16 @@ function recordCheckin(clientId, sessionDate) {
 
 /*
  *  Setup to notify on large households
+ * TODO: Add "Loading" indicator for when we are looking up household size, to avoid confusion
+ * TODO: Add error message if we fail to look up household size after a few tries
  */
 function updatePostCheckinDisplay(lastClientName, attemptNumber) {
     if (!attemptNumber) {
         attemptNumber = 1;
     }
 // quick-click-visit-history-table
+
+    var insertSpot = document.querySelector("#modal-visit-recording > div > div > div.modal-body > div.ph-item.quick-click.no-animation.quick-click-confirmation.program-content-11104")
     var mostRecentVisitorLink = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(2) > a");
     //console.log("Most Recent Vistor Link Element: ", mostRecentVisitorLink)
     //console.log("Checking for " + lastClientName)
@@ -60,7 +64,6 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
         // Example usage:
         clientIdElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(1) > a");
         const clientId = clientIdElement ? clientIdElement.innerText.trim() : null;
-        var insertSpot = document.querySelector("#modal-visit-recording > div > div > div.modal-body > div.ph-item.quick-click.no-animation.quick-click-confirmation.program-content-11104")
         var newDiv = document.createElement('div');
         if (clientId) {
             recordCheckin(clientId, new Date().toISOString().split('T')[0]);
@@ -71,7 +74,8 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
                     expiringSoonDiv.id = 'expiringSoonDiv'
                     newDiv.appendChild(expiringSoonDiv);
                 }
-                expiringSoonDiv.innerHTML = 'Renewal due soon!<br/><a href="/org/27075/intake/' + clientId + '/page/personal?search=true" style="color:#ff0000;font-weight:bold;">Go to client page</a>';
+                expiringSoonDiv.innerHTML = 'Renewal due soon!<br/>' +
+                '<a href="/org/27075/intake/' + clientId + '/page/personal?search=true" style="color:#ff0000;font-weight:bold;position:relative;z-index:2" target="_blank">Go to client page</a>';
             }
         }
         mostRecentHouseHoldElement = document.querySelector("#quick-click-visit-history-table > tbody > tr:nth-child(1) > td:nth-child(3)");
@@ -104,12 +108,13 @@ function updatePostCheckinDisplay(lastClientName, attemptNumber) {
         insertSpot.appendChild(newDiv);
     } else {
         //console.log("Couldn't find the family size.")
-        if (attemptNumber <= 3) {
+        if (attemptNumber <= 5) {
             attemptNumber++;
             //console.log("Retrying shortly");
             setTimeout(function() {updatePostCheckinDisplay(lastClientName, attemptNumber)}, 500)
         } else {
             //console.log("Max attempts reached.  Not retrying")
+            insertSpot.appendChild(document.createTextNode("Unable to retrieve household size."));
         }
     }
 }
@@ -278,10 +283,10 @@ visitRecordingObserver.observe(visitRecordingTargetNode, visitRecordingConfig);
 
 // Get clients who are due for renewal soon
 
-const EXPIRING_CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/expiring_clients.php";
+const EXPIRING_CLIENTS_API_URL = "https://ccfp.geniusstrikes.com/api/expiring.php";
 
 async function fetchExpiringClients() {
-    const authHeader = "Basic Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
+    const authHeader = "Bearer Y2NmcF9hcGlfdXNlcjpDQ0ZQYW50cnk4MyE=";
 
 
     try {
