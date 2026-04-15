@@ -290,17 +290,26 @@ if (document.location.href.indexOf('/page/personal') > -1) {
         }
         alertContent = alertContents[0];
         if (alertContent.innerText.indexOf("TEFAP Recertification Date") == 0) {
-            alertContent.innerHTML +=  " <button  id='printTEFAP_anytime'>Print TEFAP</button>";
+            alertContent.innerHTML +=  " <button id='printTEFAP_anytime'>Print TEFAP</button>";
+            alertContent.innerHTML +=  " <button id='expressPrintTEFAP' style='display:none; margin-left: 5px;'>ExpressPrint TEFAP</button>";
 
             var printTEFAPButton = document.getElementById("printTEFAP_anytime");
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
+            
+            var expressPrintButton = document.getElementById("expressPrintTEFAP");
+            expressPrintButton.addEventListener("click", handleExpressPrintClick);
         } else if (alertContent.innerText === "Recertification Required") {
             alertHTML = "TEFAP Recertification Required. Give client TEFAP form ";
-            alertHTML += "<button  id='printTEFAP'>Print TEFAP</button>";
+            alertHTML += "<button id='printTEFAP'>Print TEFAP</button>";
+            alertHTML += " <button id='expressPrintTEFAP' style='display:none; margin-left: 5px;'>ExpressPrint TEFAP</button>";
             alertContent.innerHTML = alertHTML;
 
             var printTEFAPButton = document.getElementById("printTEFAP");
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
+            
+            var expressPrintButton = document.getElementById("expressPrintTEFAP");
+            expressPrintButton.addEventListener("click", handleExpressPrintClick);
+            
             tefapAlertAlreadyShown = true;
         } else if (alertContent.innerText === "Profile Review Required") {
             alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";

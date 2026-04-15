@@ -16,6 +16,7 @@
   "content_scripts": [
     {
       "js": [
+        "scripts/pi_print.js",
         "scripts/create.js",
         "scripts/print_pdf.bundle.js"
       ],
