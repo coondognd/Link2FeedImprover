@@ -5,6 +5,8 @@
   "version": "1.3",
   "permissions": [
     "tabs",
+    "windows",
+    "storage",
     "userScripts"
   ],
   "icons": {
@@ -34,6 +36,7 @@
     },
     {
       "js": [
+        "scripts/client_facing_display.js",
         "scripts/checkin.js",
         "scripts/search.js"
       ],

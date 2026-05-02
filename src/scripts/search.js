@@ -299,7 +299,6 @@ function keepAlive() {
 setInterval(keepAlive, 2 * 60 * 1000);
 
 function checkIfOffline() {
-    console.log("Checking internet");
 
     fetch('https://ccfp.geniusstrikes.com/internet_check.php', {
         method: "GET"
@@ -307,7 +306,6 @@ function checkIfOffline() {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        console.log("Online");
         notifyOnline();
     }).catch((error) => {
         console.log("Offline");
@@ -342,3 +340,29 @@ function notifyOnline() {
 
 window.addEventListener('online', notifyOnline);
 window.addEventListener('offline', notifyOffline);
+
+// Phone search display monitoring
+function handlePhoneSearchInput() {
+    const phoneInput = document.getElementById('intake_search_phone_search_handler');
+    if (!phoneInput) return;
+
+    // Check if the input is visible
+    const isVisible = phoneInput.offsetParent !== null && phoneInput.style.display !== 'none';
+    if (!isVisible) return;
+
+    const phoneValue = phoneInput.value.trim();
+    ClientFacingDisplay.showPhoneSearch(phoneValue);
+}
+
+const phoneInput = document.getElementById('intake_search_phone_search_handler');
+var phoneInputDisplayInterval;
+if (phoneInput) {
+    phoneInput.addEventListener('input', handlePhoneSearchInput);
+    phoneInput.addEventListener('focus', () => {
+        phoneInputDisplayInterval = window.setInterval(handlePhoneSearchInput, 500);
+    });
+    phoneInput.addEventListener('blur', () => {
+        clearInterval(phoneInputDisplayInterval);
+        // Optionally clear when focus is lost, but since clearing is handled by timeout, maybe not needed
+    });
+}

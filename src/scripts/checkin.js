@@ -49,6 +49,8 @@ function recordCheckin(clientId, sessionDate) {
  * TODO: Add error message if we fail to look up household size after a few tries
  */
 function updatePostCheckinDisplay(lastClientName, attemptNumber) {
+    ClientFacingDisplay.showWelcomeMessage(lastClientName);
+
     if (!attemptNumber) {
         attemptNumber = 1;
     }

@@ -14,10 +14,14 @@ const STATIC_FILES = [
   "images",
   "english.pdf",
   "spanish.pdf",
+  "display.html",
+  "styles/display.css",
   "scripts/background.js",
   "scripts/checkin.js",
   "scripts/create.js",
   "scripts/search.js",
+  "scripts/display_page.js",
+  "scripts/client_facing_display.js",
   "scripts/pi_print.js",
 ];
 
