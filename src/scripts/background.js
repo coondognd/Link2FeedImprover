@@ -2,6 +2,10 @@ const CLIENT_DISPLAY_URL = chrome.runtime.getURL("display.html");
 let clientDisplayWindowId = null;
 let clientDisplayTabId = null;
 
+// Callbacks waiting for the window to finish being created (prevents duplicate opens
+// when ensureClientDisplayWindow is called again before the first window is ready).
+let pendingCallbacks = null;
+
 function clearClientDisplayWindow(windowId) {
   if (clientDisplayWindowId === windowId) {
     clientDisplayWindowId = null;
@@ -18,42 +22,55 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 function createClientDisplayWindow(callback) {
-  //chrome.windows.create({ url: CLIENT_DISPLAY_URL, state: "fullscreen" }, (newWindow) => {
-    chrome.windows.create({ url: CLIENT_DISPLAY_URL, width: 500, height: 500}, (newWindow) => {
+  // Queue this callback if a create is already in flight.
+  if (pendingCallbacks !== null) {
+    pendingCallbacks.push(callback);
+    return;
+  }
+  pendingCallbacks = [callback];
+
+  chrome.windows.create({ url: CLIENT_DISPLAY_URL, width: 500, height: 500 }, (newWindow) => {
+    const queued = pendingCallbacks;
+    pendingCallbacks = null;
+
     if (chrome.runtime.lastError || !newWindow || !newWindow.tabs || newWindow.tabs.length === 0) {
       console.warn("Unable to open client display window", chrome.runtime.lastError);
-      callback(null);
+      queued.forEach(cb => cb(null));
       return;
     }
 
     clientDisplayWindowId = newWindow.id;
     clientDisplayTabId = newWindow.tabs[0].id;
-    callback(clientDisplayTabId);
+    queued.forEach(cb => cb(clientDisplayTabId));
   });
 }
 
 function ensureClientDisplayWindow(callback) {
-  if (!clientDisplayWindowId) {
-    createClientDisplayWindow(callback);
+  // If we have an in-memory window ID, verify the window is still open.
+  if (clientDisplayWindowId) {
+    chrome.windows.get(clientDisplayWindowId, { populate: true }, (windowInfo) => {
+      if (!chrome.runtime.lastError && windowInfo && windowInfo.tabs && windowInfo.tabs.length > 0) {
+        clientDisplayTabId = windowInfo.tabs[0].id;
+        callback(clientDisplayTabId);
+        return;
+      }
+      clientDisplayWindowId = null;
+      clientDisplayTabId = null;
+      ensureClientDisplayWindow(callback);
+    });
     return;
   }
 
-  chrome.windows.get(clientDisplayWindowId, { populate: true }, (windowInfo) => {
-    if (chrome.runtime.lastError || !windowInfo) {
-      clientDisplayWindowId = null;
-      clientDisplayTabId = null;
-      createClientDisplayWindow(callback);
+  // No in-memory ID (e.g. after a service-worker restart). Search existing tabs
+  // for the display page before opening a new window.
+  chrome.tabs.query({ url: CLIENT_DISPLAY_URL }, (tabs) => {
+    if (tabs && tabs.length > 0) {
+      clientDisplayTabId = tabs[0].id;
+      clientDisplayWindowId = tabs[0].windowId;
+      callback(clientDisplayTabId);
       return;
     }
-
-    if (windowInfo.tabs && windowInfo.tabs.length > 0) {
-      clientDisplayTabId = windowInfo.tabs[0].id;
-      callback(clientDisplayTabId);
-    } else {
-      clientDisplayWindowId = null;
-      clientDisplayTabId = null;
-      createClientDisplayWindow(callback);
-    }
+    createClientDisplayWindow(callback);
   });
 }
 

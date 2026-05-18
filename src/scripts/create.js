@@ -310,6 +310,21 @@ if (document.location.href.indexOf('/page/personal') > -1) {
             var expressPrintButton = document.getElementById("expressPrintTEFAP");
             expressPrintButton.addEventListener("click", handleExpressPrintClick);
             
+            var languageElements = document.getElementById('s2id_intake_personal_type_languages').getElementsByClassName('select2-search-choice');
+            const languages = [];
+            for (var i = 0; i < languageElements.length; i++) {
+                languages.push(languageElements[i].innerText.trim())
+            }
+            const preferredLanguage = languages.includes('Spanish') ? 'Spanish' : 'English';
+            var message = "";
+            if (preferredLanguage == "Spanish") {
+                message = "Cada año, Nueva York exige a todos nuestros clientes que verifiquen su elegibilidad para el TEFAP. Esto solo toma un minuto. Estoy imprimiendo el formulario ahora.";
+            } else {
+                message = "Every year New York requires all our clients to verify their TEFAP eligibility.  This only takes a minute.  I'm printing the form now.";
+            }
+            if (typeof(ClientFacingDisplay) != 'undefined') {
+                ClientFacingDisplay.showMessage(message);
+            }
             tefapAlertAlreadyShown = true;
         } else if (alertContent.innerText === "Profile Review Required") {
             alertHTML = "Profile Review Required. TEFAP FORM NOT NEEDED. ";

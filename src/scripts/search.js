@@ -351,7 +351,10 @@ function handlePhoneSearchInput() {
     if (!isVisible) return;
 
     const phoneValue = phoneInput.value.trim();
-    ClientFacingDisplay.showPhoneSearch(phoneValue);
+
+    if (typeof(ClientFacingDisplay) != 'undefined') {
+        ClientFacingDisplay.showPhoneSearch(phoneValue);
+    }
 }
 
 const phoneInput = document.getElementById('intake_search_phone_search_handler');

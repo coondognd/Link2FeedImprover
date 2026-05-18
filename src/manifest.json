@@ -18,6 +18,7 @@
   "content_scripts": [
     {
       "js": [
+        "scripts/client_facing_display.js",
         "scripts/pi_print.js",
         "scripts/create.js",
         "scripts/print_pdf.bundle.js"

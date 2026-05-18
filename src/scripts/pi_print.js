@@ -11,7 +11,7 @@
  */
 
 // Configuration - adjust if your Pi is at a different address/port
-const PI_SERVER_URL = localStorage.getItem('PI_SERVER_URL') || 'http://192.168.1.100:5000';
+const PI_SERVER_URL = localStorage.getItem('PI_SERVER_URL') || 'https://ccfp-print:5000';
 const HEALTH_CHECK_INTERVAL = 5000; // Check every 5 seconds
 const PRINT_TIMEOUT = 60000; // 60 second timeout for print operation
 const STATUS_MESSAGE_DURATION = 5000; // Show status for 5 seconds
