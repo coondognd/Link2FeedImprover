@@ -297,7 +297,9 @@ if (document.location.href.indexOf('/page/personal') > -1) {
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
             
             var expressPrintButton = document.getElementById("expressPrintTEFAP");
-            expressPrintButton.addEventListener("click", handleExpressPrintClick);
+            expressPrintButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_EXPRESS_PRINT")); });
+            
+            //expressPrintButton.addEventListener("click", handleExpressPrintClick);
         } else if (alertContent.innerText === "Recertification Required") {
             alertHTML = "TEFAP Recertification Required. Give client TEFAP form ";
             alertHTML += "<button id='printTEFAP'>Print TEFAP</button>";
@@ -308,7 +310,8 @@ if (document.location.href.indexOf('/page/personal') > -1) {
             printTEFAPButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_ADD_PRINT")); });
             
             var expressPrintButton = document.getElementById("expressPrintTEFAP");
-            expressPrintButton.addEventListener("click", handleExpressPrintClick);
+            //expressPrintButton.addEventListener("click", handleExpressPrintClick);
+            expressPrintButton.addEventListener("click", () => { document.dispatchEvent(new CustomEvent("EXT_PDF_EXPRESS_PRINT")); });
             
             tefapAlertAlreadyShown = true;
         } else if (alertContent.innerText === "Profile Review Required") {

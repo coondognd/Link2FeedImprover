@@ -18,7 +18,6 @@ const STATIC_FILES = [
   "scripts/checkin.js",
   "scripts/create.js",
   "scripts/search.js",
-  "scripts/pi_print.js",
 ];
 
 // ===== STATIC FILE COPYING =====
